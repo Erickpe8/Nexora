@@ -3,13 +3,23 @@
 ## Git Flow
 Toda funcionalidad debe trabajarse en ramas feature con el formato:
 ```
-feature/tk-nombre-funcionalidad
+feature/NN-tk-nombre-funcionalidad
 ```
 
+Donde `NN` es el número de fase en dos dígitos según el roadmap:
+- `01` Fase 1
+- `02` Fase 2
+- `03` Fase 3
+- `04` Fase 4
+- `05` Fase 5
+- `06` Fase 6
+- `07` Fase 7
+- `08` Fase 8
+
 Ejemplos:
-- `feature/tk-login`
-- `feature/tk-feed-noticias`
-- `feature/tk-comentarios`
+- `feature/04-tk-autenticacion`
+- `feature/05-tk-feed-ia`
+- `feature/06-tk-comentarios`
 
 ## Commits
 
@@ -59,7 +69,7 @@ feat: Add user profile    ❌ mezcla español e inglés
 - Si se necesita más detalle, agregar cuerpo del commit separado por línea en blanco
 
 ## Por cada nueva funcionalidad
-1. Crear rama `feature/tk-nombre`
+1. Crear rama `feature/NN-tk-nombre` según el número de fase del roadmap
 2. Actualizar documentación
 3. Actualizar archivos `.kiro` si aplica
 4. Mantener consistencia arquitectónica

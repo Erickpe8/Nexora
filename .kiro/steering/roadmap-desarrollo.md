@@ -6,7 +6,7 @@ Este archivo define el orden exacto en que se debe desarrollar Nexora.
 Cada fase tiene dependencias claras. **No avanzar a la siguiente fase sin completar la actual.**
 
 Al iniciar cada fase:
-1. Crear la rama correspondiente (`feature/tk-nombre`)
+1. Crear la rama correspondiente (`feature/NN-tk-nombre`)
 2. Implementar todas las tareas de esa fase
 3. Verificar que las pruebas pasan
 4. Hacer commit con el nombre indicado
@@ -15,7 +15,7 @@ Al iniciar cada fase:
 ---
 
 ## Fase 1 — Bootstrap Backend
-**Rama:** `feature/tk-bootstrap-backend`
+**Rama:** `feature/01-tk-bootstrap-backend`
 **Spec:** `.kiro/specs/api-backend/tasks.md`
 **Estado:** `[x] Completado`
 
@@ -44,7 +44,7 @@ El servidor arranca, se conecta a MySQL y responde en `GET /` sin errores.
 ---
 
 ## Fase 2 — UI Global (Sistema de Diseño)
-**Rama:** `feature/tk-ui-global`
+**Rama:** `feature/02-tk-ui-global`
 **Spec:** `.kiro/specs/ui-global/tasks.md`
 **Estado:** `[x] Completado`
 **Dependencia:** Ninguna (puede hacerse en paralelo con Fase 1)
@@ -71,7 +71,7 @@ Todos los componentes base renderizan correctamente en Expo Go con tema oscuro.
 ---
 
 ## Fase 3 — Navegación
-**Rama:** `feature/tk-navegacion`
+**Rama:** `feature/03-tk-navegacion`
 **Spec:** `.kiro/specs/navegacion/tasks.md`
 **Estado:** `[x] Completado`
 **Dependencia:** Fase 2 (necesita componentes base para los tabs)
@@ -103,7 +103,7 @@ La app navega entre pantallas placeholder. El auth guard redirige correctamente 
 ---
 
 ## Fase 4 — Autenticación
-**Rama:** `feature/tk-autenticacion`
+**Rama:** `feature/04-tk-autenticacion`
 **Spec:** `.kiro/specs/autenticacion/tasks.md`
 **Estado:** `[x] Completado`
 **Dependencia:** Fase 1 (backend) + Fase 3 (navegación)
@@ -141,7 +141,7 @@ El usuario puede registrarse, iniciar sesión, cerrar sesión y la sesión persi
 ---
 
 ## Fase 5 — Feed con IA
-**Rama:** `feature/tk-feed-ia`
+**Rama:** `feature/05-tk-feed-ia`
 **Spec:** `.kiro/specs/feed-ia/tasks.md` + `.kiro/specs/ia-generacion/tasks.md`
 **Estado:** `[x] Completado`
 **Dependencia:** Fase 1 (backend) + Fase 4 (autenticación)
@@ -185,7 +185,7 @@ El cron genera publicaciones cada hora. El feed las muestra paginadas. El banner
 ---
 
 ## Fase 6 — Comentarios
-**Rama:** `feature/tk-comentarios`
+**Rama:** `feature/06-tk-comentarios`
 **Spec:** `.kiro/specs/comentarios/tasks.md`
 **Estado:** `[x] Completado`
 **Dependencia:** Fase 5 (necesita publicaciones para comentar)
@@ -220,7 +220,7 @@ Los usuarios pueden comentar, responder y eliminar sus comentarios. Los comentar
 ---
 
 ## Fase 7 — Notificaciones
-**Rama:** `feature/tk-notificaciones`
+**Rama:** `feature/07-tk-notificaciones`
 **Spec:** `.kiro/specs/notificaciones/tasks.md`
 **Estado:** `[x] Completado`
 **Dependencia:** Fase 6 (las notificaciones se generan desde comentarios)
@@ -259,7 +259,7 @@ El badge muestra el conteo de no leídas. Las notificaciones llegan en tiempo re
 ---
 
 ## Fase 8 — Perfil de Usuario
-**Rama:** `feature/tk-perfil-usuario`
+**Rama:** `feature/08-tk-perfil-usuario`
 **Spec:** `.kiro/specs/perfil-usuario/tasks.md`
 **Estado:** `[x] Completado`
 **Dependencia:** Fase 4 (autenticación) + Fase 6 (historial de comentarios)
@@ -297,14 +297,14 @@ El usuario puede ver y editar su perfil. Puede ver el perfil público de otros u
 
 | Fase | Módulo              | Rama                          | Dependencias     |
 |------|---------------------|-------------------------------|------------------|
-| 1    | Bootstrap Backend   | `feature/tk-bootstrap-backend`| —                |
-| 2    | UI Global           | `feature/tk-ui-global`        | —                |
-| 3    | Navegación          | `feature/tk-navegacion`       | Fase 2           |
-| 4    | Autenticación       | `feature/tk-autenticacion`    | Fases 1, 3       |
-| 5    | Feed + IA           | `feature/tk-feed-ia`          | Fases 1, 4       |
-| 6    | Comentarios         | `feature/tk-comentarios`      | Fase 5           |
-| 7    | Notificaciones      | `feature/tk-notificaciones`   | Fase 6           |
-| 8    | Perfil de Usuario   | `feature/tk-perfil-usuario`   | Fases 4, 6       |
+| 1    | Bootstrap Backend   | `feature/01-tk-bootstrap-backend`| —             |
+| 2    | UI Global           | `feature/02-tk-ui-global`        | —             |
+| 3    | Navegación          | `feature/03-tk-navegacion`       | Fase 2        |
+| 4    | Autenticación       | `feature/04-tk-autenticacion`    | Fases 1, 3    |
+| 5    | Feed + IA           | `feature/05-tk-feed-ia`          | Fases 1, 4    |
+| 6    | Comentarios         | `feature/06-tk-comentarios`      | Fase 5        |
+| 7    | Notificaciones      | `feature/07-tk-notificaciones`   | Fase 6        |
+| 8    | Perfil de Usuario   | `feature/08-tk-perfil-usuario`   | Fases 4, 6    |
 
 ## Regla para Kiro
 Antes de empezar cualquier fase, leer el `tasks.md` del spec correspondiente.
