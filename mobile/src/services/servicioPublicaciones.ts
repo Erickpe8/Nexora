@@ -1,0 +1,19 @@
+import type { Publicacion, RespuestaFeed } from '../types'
+import { clienteApi, RespuestaDatos } from './api'
+
+export const servicioPublicaciones = {
+  async obtenerFeed(token: string, pagina: number, limite: number): Promise<RespuestaFeed> {
+    const respuesta = await clienteApi.get<RespuestaDatos<RespuestaFeed>>('/publicaciones', {
+      params: { pagina, limite },
+      headers: { Authorization: `Bearer ${token}` },
+    })
+    return respuesta.data.datos
+  },
+
+  async obtenerDetalle(token: string, id: number): Promise<Publicacion> {
+    const respuesta = await clienteApi.get<RespuestaDatos<Publicacion>>(`/publicaciones/${id}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+    return respuesta.data.datos
+  },
+}

@@ -6,6 +6,7 @@ import type { ParamsRaiz } from '../types/navegacion'
 import { useContextoAuth } from '../context/ContextoAutenticacion'
 import NavegadorAutenticacion from './NavegadorAutenticacion'
 import NavegadorPrincipal from './NavegadorPrincipal'
+import RutaProtegida from './RutaProtegida'
 import { Cargador } from '../components'
 import { colores } from '../styles'
 
@@ -46,8 +47,13 @@ const NavegadorRaiz = () => {
     <NavigationContainer theme={temaNexora}>
       <Stack.Navigator screenOptions={{ headerShown: false, animation: 'none' }}>
         {usuario ? (
-          // Usuario autenticado → mostrar tabs principales
-          <Stack.Screen name="Principal" component={NavegadorPrincipal} />
+          <Stack.Screen name="Principal">
+            {() => (
+              <RutaProtegida>
+                <NavegadorPrincipal />
+              </RutaProtegida>
+            )}
+          </Stack.Screen>
         ) : (
           // Sin sesión → mostrar stack de autenticación
           <Stack.Screen name="Auth" component={NavegadorAutenticacion} />

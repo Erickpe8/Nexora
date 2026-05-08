@@ -1,17 +1,49 @@
 import React from 'react'
-import { View, SafeAreaView } from 'react-native'
-import { Texto } from '../components'
+import { Alert, SafeAreaView, ScrollView } from 'react-native'
+import { Boton, CabeceraPerfil, Cargador, EstadisticasPerfil, FormularioEditarNombre, HistorialComentarios, Texto } from '../components'
+import { useAutenticacion } from '../hooks/useAutenticacion'
+import { usePerfil } from '../hooks/usePerfil'
+import { useHistorialComentarios } from '../hooks/useHistorialComentarios'
 
-// Placeholder — se implementa en Fase 8 (Perfil de Usuario)
 const PantallaPerfil = () => {
+  const { usuario, token, cerrarSesion } = useAutenticacion()
+  const { perfil, cargando, guardando, cargar, actualizarNombre } = usePerfil(token)
+  const { historial, cargar: cargarHistorial } = useHistorialComentarios(token)
+
+  React.useEffect(() => {
+    void cargar()
+  }, [cargar])
+
+  React.useEffect(() => {
+    if (perfil) {
+      void cargarHistorial(perfil.id)
+    }
+  }, [perfil, cargarHistorial])
+
+  const manejarCerrarSesion = () => {
+    Alert.alert('Cerrar sesión', '¿Deseas cerrar tu sesión?', [
+      { text: 'Cancelar', style: 'cancel' },
+      { text: 'Cerrar sesión', style: 'destructive', onPress: () => void cerrarSesion() },
+    ])
+  }
+
   return (
     <SafeAreaView className="flex-1 bg-fondo">
-      <View className="flex-1 items-center justify-center px-4">
-        <Texto variante="titulo" centrado>Mi Perfil</Texto>
-        <Texto variante="caption" centrado className="mt-2">
-          Próximamente — Fase 8
-        </Texto>
-      </View>
+      {cargando || !perfil ? (
+        <Cargador centrado />
+      ) : (
+        <ScrollView className="flex-1 px-4 py-4">
+          <Texto variante="titulo" className="mb-3">Mi perfil</Texto>
+          <CabeceraPerfil nombre={perfil.nombre} creadoEn={perfil.creadoEn} />
+          <Texto variante="caption" className="mt-2">Correo: {perfil.correo}</Texto>
+          <EstadisticasPerfil totalComentarios={perfil.totalComentarios} />
+          <FormularioEditarNombre nombreActual={usuario?.nombre ?? perfil.nombre} guardando={guardando} onGuardar={actualizarNombre} />
+          <HistorialComentarios historial={historial} onPressItem={() => undefined} />
+          <Boton variante="secundario" className="mt-6" onPress={manejarCerrarSesion}>
+            Cerrar sesión
+          </Boton>
+        </ScrollView>
+      )}
     </SafeAreaView>
   )
 }

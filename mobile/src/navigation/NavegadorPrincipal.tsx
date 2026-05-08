@@ -1,11 +1,12 @@
 import React from 'react'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
-import { Text } from 'react-native'
+import { Text, View } from 'react-native'
 import type { ParamsTabs } from '../types/navegacion'
 import NavegadorFeed from './NavegadorFeed'
 import NavegadorNotificaciones from './NavegadorNotificaciones'
 import NavegadorPerfil from './NavegadorPerfil'
 import { colores } from '../styles'
+import { BadgeNotificaciones } from '../components'
 
 const Tab = createBottomTabNavigator<ParamsTabs>()
 
@@ -45,8 +46,12 @@ const NavegadorPrincipal = () => {
         component={NavegadorNotificaciones}
         options={{
           tabBarLabel: 'Notificaciones',
-          tabBarIcon: ({ focused }) => <IconoTab emoji="🔔" enfocado={focused} />,
-          // El badge se conectará en Fase 7 (Notificaciones)
+          tabBarIcon: ({ focused }) => (
+            <View>
+              <IconoTab emoji="🔔" enfocado={focused} />
+              <BadgeNotificaciones />
+            </View>
+          ),
         }}
       />
       <Tab.Screen

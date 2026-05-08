@@ -1,16 +1,49 @@
 import React from 'react'
-import { View, SafeAreaView } from 'react-native'
-import { Texto } from '../components'
+import { FlatList, SafeAreaView, View } from 'react-native'
+import { Boton, EstadoVacio, TarjetaNotificacion, Texto } from '../components'
+import { useAutenticacion } from '../hooks/useAutenticacion'
+import { useNotificaciones } from '../hooks/useNotificaciones'
+import { useNotificacionesEnTiempoReal } from '../hooks/useNotificacionesEnTiempoReal'
+import type { Notificacion } from '../types'
+import type { NativeStackScreenProps } from '@react-navigation/native-stack'
+import type { ParamsNotificaciones } from '../types/navegacion'
 
-// Placeholder — se implementa en Fase 7 (Notificaciones)
-const PantallaNotificaciones = () => {
+type Props = NativeStackScreenProps<ParamsNotificaciones, 'Notificaciones'>
+
+const PantallaNotificaciones = ({ navigation }: Props) => {
+  const { token } = useAutenticacion()
+  const { notificaciones, cargando, cargar, marcarLeida, marcarTodasLeidas, agregarLocal } = useNotificaciones(token)
+
+  useNotificacionesEnTiempoReal(agregarLocal)
+
+  React.useEffect(() => {
+    void cargar()
+  }, [cargar])
+
+  const manejarPress = async (notificacion: Notificacion) => {
+    if (!notificacion.leida) {
+      await marcarLeida(notificacion.id)
+    }
+    if (notificacion.publicacionId) {
+      navigation.navigate('Notificaciones')
+    }
+  }
+
   return (
     <SafeAreaView className="flex-1 bg-fondo">
-      <View className="flex-1 items-center justify-center px-4">
-        <Texto variante="titulo" centrado>Notificaciones</Texto>
-        <Texto variante="caption" centrado className="mt-2">
-          Próximamente — Fase 7
-        </Texto>
+      <View className="flex-1 px-4 pt-4">
+        <Texto variante="titulo" className="mb-3">Notificaciones</Texto>
+        <Boton variante="secundario" className="mb-3" onPress={() => void marcarTodasLeidas()}>
+          Marcar todas como leídas
+        </Boton>
+        <FlatList
+          data={notificaciones}
+          keyExtractor={item => String(item.id)}
+          refreshing={cargando}
+          onRefresh={() => void cargar()}
+          renderItem={({ item }) => <TarjetaNotificacion notificacion={item} onPress={notificacion => void manejarPress(notificacion)} />}
+          ListEmptyComponent={<EstadoVacio mensaje="Sin notificaciones" mensajeSecundario="Aún no tienes actividad nueva" />}
+        />
       </View>
     </SafeAreaView>
   )

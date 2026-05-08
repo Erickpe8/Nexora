@@ -1,13 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react'
-import AsyncStorage from '@react-native-async-storage/async-storage'
-
-const CLAVE_TOKEN = '@nexora_token'
-
-interface Usuario {
-  id: number
-  nombre: string
-  correo: string
-}
+import { useSesion } from '../hooks/useSesion'
+import type { Usuario } from '../types'
 
 interface EstadoAuth {
   usuario: Usuario | null
@@ -25,45 +18,33 @@ type ContextoAuthTipo = EstadoAuth & AccionesAuth
 const ContextoAuth = createContext<ContextoAuthTipo | null>(null)
 
 export const ProveedorAutenticacion = ({ children }: { children: ReactNode }) => {
+  const { guardarSesion: guardarSesionStorage, limpiarSesion, verificarSesionAlIniciar } = useSesion()
   const [estado, setEstado] = useState<EstadoAuth>({
     usuario: null,
     token: null,
     cargando: true,
   })
 
-  // Verificar sesión persistida al iniciar la app
   useEffect(() => {
     const cargarSesion = async () => {
       try {
-        const tokenGuardado = await AsyncStorage.getItem(CLAVE_TOKEN)
-        const usuarioGuardado = await AsyncStorage.getItem('@nexora_usuario')
-
-        if (tokenGuardado && usuarioGuardado) {
-          setEstado({
-            token: tokenGuardado,
-            usuario: JSON.parse(usuarioGuardado) as Usuario,
-            cargando: false,
-          })
-        } else {
-          setEstado(prev => ({ ...prev, cargando: false }))
-        }
+        const sesion = await verificarSesionAlIniciar()
+        setEstado({ token: sesion.token, usuario: sesion.usuario, cargando: false })
       } catch {
         setEstado(prev => ({ ...prev, cargando: false }))
       }
     }
 
     cargarSesion()
-  }, [])
+  }, [verificarSesionAlIniciar])
 
   const guardarSesion = async (token: string, usuario: Usuario): Promise<void> => {
-    await AsyncStorage.setItem(CLAVE_TOKEN, token)
-    await AsyncStorage.setItem('@nexora_usuario', JSON.stringify(usuario))
+    await guardarSesionStorage(token, usuario)
     setEstado({ token, usuario, cargando: false })
   }
 
   const cerrarSesion = async (): Promise<void> => {
-    await AsyncStorage.removeItem(CLAVE_TOKEN)
-    await AsyncStorage.removeItem('@nexora_usuario')
+    await limpiarSesion()
     setEstado({ token: null, usuario: null, cargando: false })
   }
 
