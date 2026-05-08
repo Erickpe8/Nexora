@@ -1,24 +1,54 @@
 # Stack Tecnológico — Nexora
 
-## Frontend
-- React Native
-- Expo Go
-- TypeScript
-- Axios
-- NativeWind (TailwindCSS para React Native)
+## `mobile/` — Aplicación React Native
 
-## Backend
-- Node.js + TypeScript
-- JWT para autenticación
-- WebSockets para tiempo real
+| Tecnología          | Uso                                      |
+|---------------------|------------------------------------------|
+| React Native        | Framework de UI móvil                    |
+| Expo Go             | Entorno de desarrollo y distribución     |
+| TypeScript          | Tipado estático                          |
+| Axios               | Llamadas HTTP a la API del backend       |
+| Socket.IO Client    | Conexión WebSocket para tiempo real      |
+| NativeWind          | Estilos con clases TailwindCSS           |
+| React Navigation    | Navegación entre pantallas               |
+| AsyncStorage        | Persistencia local del token JWT         |
 
-## Base de Datos
-- MySQL
+## `backend/` — Servidor Node.js
+
+| Tecnología          | Uso                                      |
+|---------------------|------------------------------------------|
+| Node.js             | Runtime del servidor                     |
+| TypeScript          | Tipado estático                          |
+| Express             | Framework HTTP                           |
+| MySQL + mysql2      | Base de datos relacional                 |
+| jsonwebtoken        | Generación y verificación de JWT         |
+| bcrypt              | Hasheo de contraseñas                    |
+| Socket.IO           | Servidor WebSocket para tiempo real      |
+| node-cron           | Cron jobs automáticos cada hora          |
+| Axios               | Llamadas a DeepSeek API                  |
+| helmet              | Headers de seguridad HTTP                |
+| cors                | Control de origen cruzado                |
+| express-rate-limit  | Límite de peticiones por IP              |
+| dotenv              | Variables de entorno                     |
 
 ## Inteligencia Artificial
-- DeepSeek API
-- Cron jobs automáticos cada hora
-- Generación automática de publicaciones
-- Resumen de noticias tecnológicas actuales
-- Preguntas controversiales automáticas
-- Feed dinámico impulsado por IA
+
+| Tecnología          | Uso                                      |
+|---------------------|------------------------------------------|
+| DeepSeek API        | Generación de publicaciones automáticas  |
+| node-cron           | Ejecución horaria del generador          |
+
+## Infraestructura
+
+| Tecnología          | Uso                                      |
+|---------------------|------------------------------------------|
+| MySQL               | Base de datos principal                  |
+| docker-compose      | Orquestación local de servicios          |
+
+## Separación estricta de dependencias
+
+Las dependencias de `mobile/` y `backend/` son completamente independientes.
+
+**`mobile/` nunca instala:** express, mysql2, jsonwebtoken, bcrypt, node-cron, helmet
+
+**`backend/` nunca instala:** react-native, expo, nativewind, react-navigation, AsyncStorage
