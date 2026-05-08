@@ -17,7 +17,7 @@ Al iniciar cada fase:
 ## Fase 1 — Bootstrap Backend
 **Rama:** `feature/tk-bootstrap-backend`
 **Spec:** `.kiro/specs/api-backend/tasks.md`
-**Estado:** `[ ] Pendiente`
+**Estado:** `[x] Completado`
 
 ### Qué hacer
 - Crear carpeta `backend/` en la raíz del monorepo con su propio `package.json`
@@ -46,7 +46,7 @@ El servidor arranca, se conecta a MySQL y responde en `GET /` sin errores.
 ## Fase 2 — UI Global (Sistema de Diseño)
 **Rama:** `feature/tk-ui-global`
 **Spec:** `.kiro/specs/ui-global/tasks.md`
-**Estado:** `[ ] Pendiente`
+**Estado:** `[x] Completado`
 **Dependencia:** Ninguna (puede hacerse en paralelo con Fase 1)
 
 ### Qué hacer
@@ -73,7 +73,7 @@ Todos los componentes base renderizan correctamente en Expo Go con tema oscuro.
 ## Fase 3 — Navegación
 **Rama:** `feature/tk-navegacion`
 **Spec:** `.kiro/specs/navegacion/tasks.md`
-**Estado:** `[ ] Pendiente`
+**Estado:** `[x] Completado`
 **Dependencia:** Fase 2 (necesita componentes base para los tabs)
 
 ### Qué hacer
@@ -105,7 +105,7 @@ La app navega entre pantallas placeholder. El auth guard redirige correctamente 
 ## Fase 4 — Autenticación
 **Rama:** `feature/tk-autenticacion`
 **Spec:** `.kiro/specs/autenticacion/tasks.md`
-**Estado:** `[ ] Pendiente`
+**Estado:** `[x] Completado`
 **Dependencia:** Fase 1 (backend) + Fase 3 (navegación)
 
 ### Qué hacer
@@ -143,7 +143,7 @@ El usuario puede registrarse, iniciar sesión, cerrar sesión y la sesión persi
 ## Fase 5 — Feed con IA
 **Rama:** `feature/tk-feed-ia`
 **Spec:** `.kiro/specs/feed-ia/tasks.md` + `.kiro/specs/ia-generacion/tasks.md`
-**Estado:** `[ ] Pendiente`
+**Estado:** `[x] Completado`
 **Dependencia:** Fase 1 (backend) + Fase 4 (autenticación)
 
 ### Qué hacer
@@ -187,7 +187,7 @@ El cron genera publicaciones cada hora. El feed las muestra paginadas. El banner
 ## Fase 6 — Comentarios
 **Rama:** `feature/tk-comentarios`
 **Spec:** `.kiro/specs/comentarios/tasks.md`
-**Estado:** `[ ] Pendiente`
+**Estado:** `[x] Completado`
 **Dependencia:** Fase 5 (necesita publicaciones para comentar)
 
 ### Qué hacer
@@ -222,7 +222,7 @@ Los usuarios pueden comentar, responder y eliminar sus comentarios. Los comentar
 ## Fase 7 — Notificaciones
 **Rama:** `feature/tk-notificaciones`
 **Spec:** `.kiro/specs/notificaciones/tasks.md`
-**Estado:** `[ ] Pendiente`
+**Estado:** `[x] Completado`
 **Dependencia:** Fase 6 (las notificaciones se generan desde comentarios)
 
 ### Qué hacer
@@ -261,7 +261,7 @@ El badge muestra el conteo de no leídas. Las notificaciones llegan en tiempo re
 ## Fase 8 — Perfil de Usuario
 **Rama:** `feature/tk-perfil-usuario`
 **Spec:** `.kiro/specs/perfil-usuario/tasks.md`
-**Estado:** `[ ] Pendiente`
+**Estado:** `[x] Completado`
 **Dependencia:** Fase 4 (autenticación) + Fase 6 (historial de comentarios)
 
 ### Qué hacer
