@@ -1,5 +1,5 @@
 import type { ResultSetHeader } from 'mysql2/promise'
-import { pool } from '../config/baseDatos'
+import { pool } from '../shared/database/pool'
 import type { Publicacion, PublicacionIA, ResultadoGeneracion } from '../types'
 import { obtenerPublicacionPorId } from './publicaciones.servicio'
 

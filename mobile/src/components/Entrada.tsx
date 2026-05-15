@@ -32,13 +32,9 @@ const Entrada = ({
       )}
 
       <View
-        className={`
-          flex-row items-center
-          bg-elevado rounded-xl px-4
-          border
-          ${enfocado ? 'border-borde-foco' : 'border-borde'}
-          ${error ? 'border-error' : ''}
-        `}
+        className={`flex-row items-center bg-elevado rounded-xl px-4 border ${
+          error ? 'border-error' : enfocado ? 'border-borde-foco' : 'border-borde'
+        }`}
       >
         <TextInput
           className={`flex-1 py-3 text-base text-base ${className ?? ''}`}

@@ -1,6 +1,6 @@
 import type { ResultSetHeader, RowDataPacket } from 'mysql2/promise'
-import { pool } from '../config/baseDatos'
-import { io } from '../sockets/socket'
+import { pool } from '../shared/database/pool'
+import { io } from '../infrastructure/sockets/socket'
 import type { Notificacion, TipoNotificacion } from '../types'
 
 interface NotificacionFila extends RowDataPacket {

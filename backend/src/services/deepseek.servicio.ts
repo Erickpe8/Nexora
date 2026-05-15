@@ -1,6 +1,6 @@
 import axios from 'axios'
-import { entorno } from '../config/entorno'
-import { ErrorHttp } from '../middlewares/errores'
+import { entorno } from '../shared/config/entorno'
+import { ErrorHttp } from '../shared/errors/errorHttp'
 import type { PublicacionIA } from '../types'
 
 interface RespuestaDeepSeek {

@@ -1,7 +1,7 @@
 import type { ResultSetHeader, RowDataPacket } from 'mysql2/promise'
-import { pool } from '../config/baseDatos'
-import { io } from '../sockets/socket'
-import { ErrorHttp } from '../middlewares/errores'
+import { pool } from '../shared/database/pool'
+import { io } from '../infrastructure/sockets/socket'
+import { ErrorHttp } from '../shared/errors/errorHttp'
 import { crearNotificacion } from './notificaciones.servicio'
 import type { Comentario, NuevoComentario } from '../types'
 

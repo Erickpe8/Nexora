@@ -40,15 +40,27 @@ mobile/src/
 ### `backend/src/`
 ```
 backend/src/
-├── config/        -- conexión DB, variables de entorno
-├── controllers/   -- orquestación de requests (sin lógica de negocio)
-├── services/      -- lógica de negocio y queries
-├── routes/        -- definición de rutas Express
-├── middlewares/   -- auth, validación, errores, rate limiting
-├── sockets/       -- configuración y eventos Socket.IO
-├── cron/          -- cron jobs
-├── types/         -- interfaces y types TypeScript
-└── utils/         -- funciones puras de utilidad
+├── app.ts                 -- fábrica Express (sin listen)
+├── server.ts              -- arranque HTTP + Socket.IO + cron
+├── shared/
+│   ├── config/            -- entorno (.env)
+│   ├── database/          -- pool MySQL
+│   ├── errors/            -- ErrorHttp y errores de dominio
+│   └── logger/            -- registro mínimo estructurado
+├── infrastructure/
+│   ├── sockets/           -- Socket.IO
+│   ├── cron/              -- jobs programados (generación IA)
+│   ├── database/          -- DDL / crearTablas
+│   ├── observability/     -- logs de generación IA, etc.
+│   ├── ai/                -- hooks futuros proveedor IA
+│   └── cache/             -- reservado
+├── modules/               -- dominios futuros (auth, feed, …); rutas hoy en routes/
+├── controllers/           -- orquestación HTTP
+├── services/              -- lógica de negocio y queries
+├── routes/                -- rutas Express
+├── middlewares/           -- auth, validación, errores, rate limiting
+├── types/                 -- interfaces y types TypeScript
+└── utils/                 -- funciones puras (jwt, …)
 ```
 
 ## Estilo de código

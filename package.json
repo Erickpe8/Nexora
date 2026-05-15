@@ -1,12 +1,15 @@
 {
   "name": "nexora",
   "version": "1.0.0",
-  "main": "index.ts",
+  "private": true,
   "scripts": {
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "tablas": "npm run tablas --prefix backend",
+    "vercel-install": "npm install --prefix backend && npm install --prefix mobile",
+    "vercel-build": "node scripts/vercel-build.cjs"
   },
   "dependencies": {
     "expo": "~54.0.33",

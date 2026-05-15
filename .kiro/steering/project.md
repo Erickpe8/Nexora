@@ -30,3 +30,7 @@ Estudiantes, desarrolladores y entusiastas de la tecnología que buscan conectar
 
 ## Visión
 Construir una red social moderna impulsada por IA donde la comunidad tecnológica pueda debatir noticias actuales, compartir conocimiento e interactuar en tiempo real. El proyecto debe sentirse como un producto real, moderno y escalable.
+
+## Metodología de documentación
+
+Flujo vivo **analizar → detectar → proponer → actualizar arquitectura → crear SPEC**; SPECS no aislados (dependencias + próximos SPECS); estructura completa de `requirements.md`, Gitflow y commits: **`.kiro/steering/metodologia-documentacion-specs.md`**.

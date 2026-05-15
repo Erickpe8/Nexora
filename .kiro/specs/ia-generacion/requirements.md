@@ -1,5 +1,7 @@
 # Requisitos — Generación Automática con IA
 
+> **Arquitectura evolutiva del pipeline** (etapas, observabilidad, colas, versionado de prompts): ver `.kiro/specs/pipeline-generacion-ia/requirements.md`.
+
 ## Objetivo
 Generar automáticamente publicaciones de calidad cada hora usando DeepSeek API, con noticias tecnológicas actuales, resúmenes claros y preguntas controversiales que incentiven el debate.
 

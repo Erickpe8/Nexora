@@ -77,19 +77,19 @@ mobile/
 ```
 backend/
 ├── src/
-│   ├── config/        -- conexión DB, variables de entorno
-│   ├── controllers/   -- orquestación de requests
-│   ├── services/      -- lógica de negocio
-│   ├── routes/        -- definición de rutas Express
-│   ├── middlewares/   -- auth, validación, errores, rate limiting
-│   ├── sockets/       -- configuración y eventos Socket.IO
-│   ├── cron/          -- cron jobs (generación IA)
-│   ├── types/         -- interfaces y types TypeScript
-│   └── utils/         -- funciones puras de utilidad
-├── prisma/            -- schema y migraciones (o scripts SQL)
-├── logs/              -- archivos de log generados en runtime
-├── uploads/           -- archivos subidos (reservado para futuro)
-├── .env               -- variables de entorno (no commitear)
+│   ├── app.ts
+│   ├── server.ts
+│   ├── shared/            -- config, database pool, errors, logger
+│   ├── infrastructure/    -- sockets, cron, observability, database DDL, cache, ai
+│   ├── modules/           -- evolución por dominio (hoy vacío de rutas)
+│   ├── controllers/
+│   ├── services/
+│   ├── routes/
+│   ├── middlewares/
+│   ├── types/
+│   └── utils/
+├── logs/
+├── .env
 ├── tsconfig.json
 └── package.json
 ```
@@ -128,7 +128,8 @@ backend/
 
 ```
 [Cron Job — cada hora]
-    └── backend/src/cron/cronGenerador.ts
+    └── backend/src/infrastructure/cron/cronGenerador.ts
+          └── Orquestador de pipeline (ver `.kiro/specs/pipeline-generacion-ia/`)
           └── Consulta DeepSeek API
           └── Valida y guarda publicación en MySQL
           └── Socket.IO emite 'nuevas_publicaciones' a todos los clientes
@@ -163,12 +164,26 @@ Mobile y backend se comunican únicamente a través de:
 
 ---
 
+## SPECS transversales (confianza y operación)
+
+Módulos de requisitos **extendidos** (formato unificado en `requirements.md`) que cruzan varios features sin duplicar el núcleo de producto:
+
+| Carpeta | Propósito |
+|---------|-----------|
+| `.kiro/specs/moderacion-confianza-contenido/` | Denuncias, visibilidad de comentarios y gobernanza de riesgo sobre UGC + excepciones IA. |
+| `.kiro/specs/observabilidad-plataforma/` | Logs estructurados, correlación, salud del servicio y señales mínimas de rendimiento. |
+| `.kiro/specs/gestion-configuracion-secretos/` | Variables de entorno, secretos, validación al arranque y reglas Expo `EXPO_PUBLIC_*`. |
+| `.kiro/specs/pipeline-generacion-ia/` | Arquitectura evolutiva del pipeline IA (etapas, persistencia antes de socket, versionado de prompts, colas futuras). |
+
+---
+
 ## Reglas para Kiro
 
+0. **SPECS nuevos o extendidos** deben seguir `.kiro/steering/metodologia-documentacion-specs.md`: flujo *analizar → detectar → proponer → actualizar arquitectura → crear SPEC*; estructura completa de `requirements.md` (incluye `## Problema actual detectado` … `## Próximos SPECS recomendados` y secciones finales `# CONTEXTO PARA DESARROLLO` / `# PREGUNTAS PARA CONTINUIDAD DEL PROYECTO`). **No SPECS aislados:** dependencias y próximos SPECS explícitos.
 1. **Siempre identificar en qué lado vive el código** antes de generarlo
 2. **Nunca mezclar imports** de React Native en el backend ni de Express en mobile
 3. **Rutas de archivos**: usar `mobile/src/...` o `backend/src/...` siempre con el prefijo correcto
 4. **Al generar specs**: separar claramente las secciones "Backend" y "Frontend (Mobile)"
 5. **Al generar código**: confirmar el contexto (¿estamos en mobile o backend?) antes de escribir
-6. **Variables de entorno**: cada proyecto tiene su propio `.env` independiente
+6. **Variables de entorno**: cada proyecto tiene su propio `.env` independiente; en backend la lectura tipada vive en `shared/config/entorno.ts` y el pool MySQL en `shared/database/pool.ts`
 7. **Dependencias**: nunca instalar una dependencia de backend en mobile ni viceversa

@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken'
-import { entorno } from '../config/entorno'
+import { entorno } from '../shared/config/entorno'
 import type { UsuarioToken } from '../types'
 
 // Generar token JWT para un usuario autenticado

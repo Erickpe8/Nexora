@@ -61,6 +61,16 @@ export interface ResultadoGeneracion {
   publicaciones: Publicacion[]
 }
 
+/** Resultado de un ciclo completo del orquestador IA (cron o disparo manual). */
+export interface ResultadoCicloOrquestadorIA {
+  ejecucionId: string
+  intentadas: number
+  guardadas: number
+  descartadas: number
+  errores: string[]
+  duracionMs: number
+}
+
 export interface Comentario {
   id: number
   publicacionId: number

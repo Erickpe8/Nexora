@@ -1,0 +1,2 @@
+/** Dominio analytics — reservado. */
+export {}

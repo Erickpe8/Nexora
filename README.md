@@ -21,8 +21,12 @@ cd backend
 cp .env.example .env   # configurar variables de entorno
 npm install
 npm run tablas         # crear tablas en MySQL
-npm run dev            # servidor en http://localhost:3000
+npm run dev            # servidor (src/server.ts) — puerto según PUERTO en .env
 ```
+
+Desde la **raíz del repo** también puedes ejecutar `npm run tablas` (delega en `backend/`).
+
+**Salud (observabilidad):** `GET /api/salud` (estado + uptime + MySQL), `GET /api/salud/listo` (liveness), `GET /api/salud/vivo` (readiness; responde 503 si MySQL no responde). Estas rutas no usan el rate limiter global.
 
 ### Mobile
 ```bash
@@ -43,4 +47,4 @@ npm start              # abrir en Expo Go
 ## Variables de entorno
 
 Ver `backend/.env.example` para la configuración requerida del backend.
-Para mobile, usar `mobile/.env.example` y definir `EXPO_PUBLIC_API_URL`.
+Para mobile, usar `mobile/.env.example` y definir `EXPO_PUBLIC_API_URL` (mismo host y puerto que `PUERTO` en `backend/.env`, ruta terminada en `/api`). Si las peticiones expiran, revisa ese valor, que MySQL responda y que Chrome no tenga la red simulada en "Slow 4G"; opcional: `EXPO_PUBLIC_API_TIMEOUT_MS` (por defecto el cliente espera hasta 60s).

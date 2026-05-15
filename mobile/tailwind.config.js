@@ -13,6 +13,14 @@ module.exports = {
         tarjeta: '#1A1A1A',
         elevado: '#242424',
 
+        // Auth (pantallas login/registro — mobile-first)
+        'auth-canvas': '#09090b',
+        'auth-surface': '#111113',
+        'auth-elevated': '#18181b',
+        'auth-stroke': '#27272a',
+        'auth-muted': '#a1a1aa',
+        'auth-subtle': '#d4d4d8',
+
         // Textos
         base: '#F0F0F0',
         secundario: '#9A9A9A',

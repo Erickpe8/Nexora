@@ -1,5 +1,7 @@
 # Comportamiento de Kiro — Nexora
 
+Metodología oficial de SPECS, SDD, Gitflow y commits: **`.kiro/steering/metodologia-documentacion-specs.md`**.
+
 ## Principios generales
 - Priorizar simplicidad y mantenibilidad sobre elegancia técnica
 - Evitar sobreingeniería en todo momento
@@ -50,10 +52,11 @@
 - Nunca poner queries SQL en controladores ni en rutas
 
 ## Flujo de trabajo
-- Seguir el orden de fases definido en `roadmap-desarrollo.md`
-- Cada funcionalidad en su rama `feature/tk-nombre`
+- Seguir el orden de fases definido en `roadmap-desarrollo.md` cuando aplique
+- **Spec-Driven Development:** antes de implementación compleja, crear o actualizar el SPEC según `.kiro/steering/metodologia-documentacion-specs.md` y la plantilla `.kiro/templates/spec-template/requirements.md`
+- Cada funcionalidad en rama desde `develop`: `feature/<nombre-feature>` o, si el roadmap lo exige, `feature/NN-tk-nombre`
 - Actualizar documentación y archivos `.kiro` cuando aplique
-- Commits siempre en español con el formato definido en `flujo-trabajo.md`
+- Commits con el formato definido en `flujo-trabajo.md` (Conventional Commits con `tipo(alcance): descripción`)
 
 ## Restricciones
 - No introducir dependencias nuevas sin justificación clara

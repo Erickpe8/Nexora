@@ -1,7 +1,7 @@
 import bcrypt from 'bcrypt'
-import { pool } from '../config/baseDatos'
+import { pool } from '../shared/database/pool'
 import { generarToken } from '../utils/jwt'
-import { ErrorHttp } from '../middlewares/errores'
+import { ErrorHttp } from '../shared/errors/errorHttp'
 import type { DatosRegistro, CredencialesLogin, RespuestaAuth, Usuario } from '../types'
 import type { ResultSetHeader, RowDataPacket } from 'mysql2/promise'
 

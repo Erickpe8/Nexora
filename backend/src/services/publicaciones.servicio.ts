@@ -1,6 +1,6 @@
 import type { RowDataPacket } from 'mysql2/promise'
-import { pool } from '../config/baseDatos'
-import { ErrorHttp } from '../middlewares/errores'
+import { pool } from '../shared/database/pool'
+import { ErrorHttp } from '../shared/errors/errorHttp'
 import type { Publicacion, RespuestaFeed } from '../types'
 
 interface PublicacionFila extends RowDataPacket {

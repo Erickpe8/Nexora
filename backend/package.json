@@ -2,12 +2,12 @@
   "name": "nexora-backend",
   "version": "1.0.0",
   "description": "API REST + WebSockets + Cron Jobs para Nexora",
-  "main": "dist/servidor.js",
+  "main": "dist/server.js",
   "scripts": {
-    "dev": "nodemon --exec ts-node src/servidor.ts",
+    "dev": "nodemon --exec \"node --disable-warning=DEP0169 -r ts-node/register\" src/server.ts",
     "build": "tsc",
-    "start": "node dist/servidor.js",
-    "tablas": "ts-node src/config/crearTablas.ts"
+    "start": "node dist/server.js",
+    "tablas": "ts-node src/infrastructure/database/crearTablas.ts"
   },
   "dependencies": {
     "axios": "^1.7.9",

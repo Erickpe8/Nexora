@@ -1,6 +1,6 @@
 import type { ResultSetHeader, RowDataPacket } from 'mysql2/promise'
-import { pool } from '../config/baseDatos'
-import { ErrorHttp } from '../middlewares/errores'
+import { pool } from '../shared/database/pool'
+import { ErrorHttp } from '../shared/errors/errorHttp'
 import type { ItemHistorial, PerfilPublico, PerfilUsuario } from '../types'
 
 interface PerfilFila extends RowDataPacket {
