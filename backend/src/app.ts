@@ -3,12 +3,15 @@ import helmet from 'helmet'
 import cors from 'cors'
 import { limitadorGeneral } from './middlewares/rateLimiting'
 import { middlewareErrores, middlewareNoEncontrado } from './middlewares/errores'
+import { middlewareCorrelacion } from './middlewares/correlacion'
 import rutasAuth from './routes/auth.rutas'
 import rutasPublicaciones from './routes/publicaciones.rutas'
 import rutasComentarios from './routes/comentarios.rutas'
 import rutasNotificaciones from './routes/notificaciones.rutas'
 import rutasUsuarios from './routes/usuarios.rutas'
 import rutasSalud from './routes/salud.rutas'
+import rutasModeracion from './routes/moderacion.rutas'
+import rutasInterno from './routes/interno.rutas'
 
 /**
  * Construye la aplicación HTTP sin efectos de lado de listen.
@@ -21,6 +24,7 @@ export const crearAplicacion = (): Express => {
   app.use(cors({ origin: '*' }))
   app.use(express.json())
   app.use(express.urlencoded({ extended: true }))
+  app.use(middlewareCorrelacion)
   app.use('/api/salud', rutasSalud)
   app.use(limitadorGeneral)
 
@@ -33,6 +37,8 @@ export const crearAplicacion = (): Express => {
   app.use('/api/comentarios', rutasComentarios)
   app.use('/api/usuarios', rutasUsuarios)
   app.use('/api/notificaciones', rutasNotificaciones)
+  app.use('/api/moderacion', rutasModeracion)
+  app.use('/api/interno', rutasInterno)
 
   app.use(middlewareNoEncontrado)
   app.use(middlewareErrores)

@@ -13,7 +13,10 @@ interface ComentarioFila extends RowDataPacket {
   comentario_padre_id: number | null
   contenido: string
   eliminado: number
+  estado_moderacion: 'visible' | 'oculto'
   creado_en: string
+  total_likes: number
+  me_dio_like: number
 }
 
 const mapearComentario = (fila: ComentarioFila): Comentario => ({
@@ -24,30 +27,39 @@ const mapearComentario = (fila: ComentarioFila): Comentario => ({
   comentarioPadreId: fila.comentario_padre_id,
   contenido: Boolean(fila.eliminado) ? '[comentario eliminado]' : fila.contenido,
   eliminado: Boolean(fila.eliminado),
+  estadoModeracion: fila.estado_moderacion ?? 'visible',
   creadoEn: fila.creado_en,
   respuestas: [],
+  totalLikes: Number(fila.total_likes || 0),
+  meDioLike: Boolean(fila.me_dio_like),
 })
 
-const obtenerComentarioPorId = async (comentarioId: number): Promise<ComentarioFila | null> => {
+const obtenerComentarioPorId = async (comentarioId: number, usuarioId = 0): Promise<ComentarioFila | null> => {
   const [filas] = await pool.execute<ComentarioFila[]>(
-    `SELECT c.id, c.publicacion_id, c.usuario_id, u.nombre AS nombre_usuario, c.comentario_padre_id, c.contenido, c.eliminado, c.creado_en
+    `SELECT c.id, c.publicacion_id, c.usuario_id, u.nombre AS nombre_usuario,
+            c.comentario_padre_id, c.contenido, c.eliminado, c.estado_moderacion, c.creado_en,
+            (SELECT COUNT(*) FROM likes_comentario l WHERE l.comentario_id = c.id) AS total_likes,
+            (SELECT COUNT(*) FROM likes_comentario l2 WHERE l2.comentario_id = c.id AND l2.usuario_id = ?) AS me_dio_like
      FROM comentarios c
      INNER JOIN usuarios u ON u.id = c.usuario_id
      WHERE c.id = ?
      LIMIT 1`,
-    [comentarioId]
+    [usuarioId, comentarioId]
   )
   return filas[0] ?? null
 }
 
-export const obtenerComentariosPublicacion = async (publicacionId: number): Promise<Comentario[]> => {
+export const obtenerComentariosPublicacion = async (publicacionId: number, usuarioId = 0): Promise<Comentario[]> => {
   const [filas] = await pool.execute<ComentarioFila[]>(
-    `SELECT c.id, c.publicacion_id, c.usuario_id, u.nombre AS nombre_usuario, c.comentario_padre_id, c.contenido, c.eliminado, c.creado_en
+    `SELECT c.id, c.publicacion_id, c.usuario_id, u.nombre AS nombre_usuario,
+            c.comentario_padre_id, c.contenido, c.eliminado, c.estado_moderacion, c.creado_en,
+            (SELECT COUNT(*) FROM likes_comentario l WHERE l.comentario_id = c.id) AS total_likes,
+            (SELECT COUNT(*) FROM likes_comentario l2 WHERE l2.comentario_id = c.id AND l2.usuario_id = ?) AS me_dio_like
      FROM comentarios c
      INNER JOIN usuarios u ON u.id = c.usuario_id
      WHERE c.publicacion_id = ?
      ORDER BY c.creado_en ASC`,
-    [publicacionId]
+    [usuarioId, publicacionId]
   )
 
   const comentariosRaiz: Comentario[] = []
@@ -84,7 +96,7 @@ export const crearComentario = async (
   let comentarioPadreId: number | null = null
   let autorPadreId: number | null = null
   if (datos.comentarioPadreId) {
-    const comentarioPadre = await obtenerComentarioPorId(datos.comentarioPadreId)
+    const comentarioPadre = await obtenerComentarioPorId(datos.comentarioPadreId, usuarioId)
     if (!comentarioPadre || comentarioPadre.publicacion_id !== publicacionId) {
       throw new ErrorHttp('El comentario padre no existe', 400)
     }
@@ -101,7 +113,7 @@ export const crearComentario = async (
     [publicacionId, usuarioId, comentarioPadreId, contenido]
   )
 
-  const fila = await obtenerComentarioPorId(resultado.insertId)
+  const fila = await obtenerComentarioPorId(resultado.insertId, usuarioId)
   if (!fila) {
     throw new ErrorHttp('No se pudo crear el comentario', 500)
   }
@@ -143,7 +155,7 @@ export const eliminarComentario = async (
   usuarioId: number,
   socketId: string | null
 ): Promise<void> => {
-  const comentario = await obtenerComentarioPorId(comentarioId)
+  const comentario = await obtenerComentarioPorId(comentarioId, usuarioId)
   if (!comentario) {
     throw new ErrorHttp('Comentario no encontrado', 404)
   }

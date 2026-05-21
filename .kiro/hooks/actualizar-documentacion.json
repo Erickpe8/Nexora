@@ -1,0 +1,12 @@
+{
+  "name": "Actualizar Documentación",
+  "version": "1.0.0",
+  "description": "Recuerda al agente que debe actualizar la documentación relevante cada vez que se implementa o modifica una funcionalidad. Ningún commit debe incluir código nuevo sin documentación actualizada.",
+  "when": {
+    "type": "agentStop"
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "El agente acaba de terminar su ejecución. Verifica si se realizaron cambios que requieren actualizar documentación según .kiro/steering/metodologia-documentacion-specs.md:\n\n1. Specs: ¿El requirements.md del módulo afectado refleja el comportamiento actual? ¿El design.md describe la arquitectura actualizada? ¿El tasks.md tiene las tareas completadas marcadas con [x]?\n2. Steering: ¿Se introdujo alguna convención nueva que deba documentarse en convenciones.md? ¿Cambió el stack? ¿Cambió el flujo de trabajo?\n3. README: ¿Hay endpoints nuevos que documentar? ¿Variables de entorno nuevas que listar?\n4. roadmap-desarrollo.md: ¿Alguna fase debe marcarse como completada?\n\nSi hay documentación desactualizada, actualízala ahora. Ningún cambio de código debe quedar sin su documentación correspondiente."
+  }
+}

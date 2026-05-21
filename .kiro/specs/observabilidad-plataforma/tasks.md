@@ -2,25 +2,25 @@
 
 ## Fundamentos
 
-- [ ] Utilidad `logger` con salida JSON y niveles.
-- [ ] Middleware de correlación y registro de duración en Express.
+- [x] Utilidad `logger` con salida JSON y niveles (`info`, `advertencia`, `error`, `debug`).
+- [x] Middleware de correlación y registro de duración en Express (`middlewares/correlacion.ts`).
 
 ## Salud
 
-- [ ] Implementar rutas `listo` / `vivo` (o nombres finales unificados en español según convención del equipo).
-- [ ] Integrar chequeo MySQL opcional con timeout corto.
+- [x] Implementar rutas `listo` / `vivo` (`/api/salud/listo`, `/api/salud/vivo`).
+- [x] Integrar chequeo MySQL opcional con timeout corto (2000ms).
 
 ## IA y cron
 
-- [ ] Añadir `ejecucionId` y métricas agregadas al job de generación.
-- [ ] Log de errores DeepSeek categorizados (red, 4xx, 5xx, parseo).
+- [x] Añadir `ejecucionId` y métricas agregadas al job de generación.
+- [x] Log de errores DeepSeek categorizados (red, 4xx, 5xx, parseo).
 
 ## Sockets
 
-- [ ] Logs en fallo de autenticación JWT en handshake.
-- [ ] Contador opcional de sockets conectados.
+- [x] Logs en fallo de autenticación JWT en handshake.
+- [x] Contador de sockets conectados (`obtenerSocketsConectados()`).
 
 ## Calidad
 
-- [ ] Guía breve en steering o comentario de equipo: campos permitidos en logs.
-- [ ] Script o regla de CI que falle si se detectan `console.log` crudos en rutas críticas (opcional).
+- [x] Sanitización de campos sensibles en logs (lista deny en `registro.ts`).
+- [ ] Script o regla de CI que falle si se detectan `console.log` crudos en rutas críticas (opcional, pendiente CI).

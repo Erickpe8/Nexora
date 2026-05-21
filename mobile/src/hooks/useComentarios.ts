@@ -29,6 +29,24 @@ const marcarComentarioEliminado = (comentarios: Comentario[], id: number): Comen
   })
 }
 
+const cambiarEstadoModeracion = (
+  comentarios: Comentario[],
+  id: number,
+  estado: 'visible' | 'oculto'
+): Comentario[] => {
+  return comentarios.map(comentario => {
+    if (comentario.id === id) {
+      return { ...comentario, estadoModeracion: estado }
+    }
+    return {
+      ...comentario,
+      respuestas: comentario.respuestas.map(respuesta =>
+        respuesta.id === id ? { ...respuesta, estadoModeracion: estado } : respuesta
+      ),
+    }
+  })
+}
+
 export const useComentarios = (token: string | null, publicacionId: number) => {
   const [comentarios, setComentarios] = useState<Comentario[]>([])
   const [cargando, setCargando] = useState(false)
@@ -91,5 +109,7 @@ export const useComentarios = (token: string | null, publicacionId: number) => {
     eliminar,
     insertarDesdeTiempoReal: (comentario: Comentario) => setComentarios(prev => insertarComentario(prev, comentario)),
     marcarEliminadoTiempoReal: (id: number) => setComentarios(prev => marcarComentarioEliminado(prev, id)),
+    ocultarDesdeTiempoReal: (id: number) => setComentarios(prev => cambiarEstadoModeracion(prev, id, 'oculto')),
+    restaurarDesdeTiempoReal: (id: number) => setComentarios(prev => cambiarEstadoModeracion(prev, id, 'visible')),
   }
 }

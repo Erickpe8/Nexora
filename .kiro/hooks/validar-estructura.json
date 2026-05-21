@@ -1,0 +1,13 @@
+{
+  "name": "Validar Estructura",
+  "version": "1.0.0",
+  "description": "Verifica que los archivos nuevos se crean en la carpeta correcta según la arquitectura del monorepo Nexora y que no se mezclan responsabilidades entre mobile y backend.",
+  "when": {
+    "type": "fileCreated",
+    "patterns": ["mobile/src/**/*.ts", "mobile/src/**/*.tsx", "backend/src/**/*.ts"]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Se acaba de crear un archivo nuevo en el proyecto. Verifica que cumple la estructura arquitectónica de Nexora definida en .kiro/steering/arquitectura-monorepo.md y .kiro/steering/convenciones.md:\n\nPara mobile/src/:\n- Componentes reutilizables solo en components/ (sin lógica de negocio)\n- Pantallas completas solo en screens/\n- Lógica con estado solo en hooks/ (prefijo use)\n- Llamadas HTTP y WebSocket solo en services/\n- Navegadores y rutas solo en navigation/\n- Interfaces y types solo en types/\n- Funciones puras solo en utils/\n- Tokens de diseño solo en styles/\n\nPara backend/src/:\n- Controladores solo orquestan (sin queries SQL ni lógica de negocio)\n- Servicios contienen lógica de negocio y queries SQL\n- Rutas solo definen path, método y middlewares\n- Variables de entorno solo se leen desde shared/config/entorno.ts\n- Sin imports de React Native en backend\n- Sin imports de Express o mysql2 en mobile\n\nSi el archivo está en el lugar incorrecto o mezcla responsabilidades, indícalo con la corrección recomendada."
+  }
+}

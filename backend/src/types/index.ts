@@ -39,12 +39,28 @@ export interface Publicacion {
   generadoPorIa: boolean
   creadoEn: string
   totalComentarios: number
+  totalReacciones: number
+  miReaccion: TipoReaccion | null
 }
 
 export interface RespuestaFeed {
   publicaciones: Publicacion[]
   pagina: number
   totalPaginas: number
+}
+
+export type TipoReaccion = 'me_gusta' | 'fuego' | 'mente_explotada' | 'curioso'
+
+export interface Reaccion {
+  publicacionId: number
+  usuarioId: number
+  tipo: TipoReaccion
+}
+
+export interface ResumenReacciones {
+  total: number
+  porTipo: Record<TipoReaccion, number>
+  miReaccion: TipoReaccion | null
 }
 
 export interface PublicacionIA {
@@ -79,8 +95,11 @@ export interface Comentario {
   comentarioPadreId: number | null
   contenido: string
   eliminado: boolean
+  estadoModeracion: 'visible' | 'oculto'
   creadoEn: string
   respuestas: Comentario[]
+  totalLikes: number
+  meDioLike: boolean
 }
 
 export interface NuevoComentario {
@@ -123,6 +142,37 @@ export interface ItemHistorial {
     id: number
     titulo: string
   }
+}
+
+// --- Moderación y Denuncias ---
+
+export type MotivosDenuncia = 'spam' | 'acoso' | 'contenido_inapropiado' | 'desinformacion' | 'otro'
+export type EstadoDenuncia = 'pendiente' | 'revisada' | 'resuelta' | 'descartada'
+export type EstadoModeracion = 'visible' | 'oculto'
+
+export interface NuevaDenuncia {
+  tipoObjetivo: 'comentario' | 'publicacion'
+  objetivoId: number
+  motivo: MotivosDenuncia
+  detalle?: string
+}
+
+export interface Denuncia {
+  id: number
+  tipoObjetivo: 'comentario' | 'publicacion'
+  objetivoId: number
+  autorId: number
+  motivo: string
+  detalle: string | null
+  estado: EstadoDenuncia
+  creadoEn: string
+}
+
+export interface RespuestaPaginadaDenuncias {
+  denuncias: Denuncia[]
+  pagina: number
+  totalPaginas: number
+  total: number
 }
 
 // Extender Request de Express para incluir el usuario autenticado

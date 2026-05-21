@@ -1,0 +1,12 @@
+{
+  "name": "Actualizar Specs",
+  "version": "1.0.0",
+  "description": "Recuerda al agente que debe mantener los archivos de spec sincronizados con la implementación real cuando se completa una tarea o se modifica la arquitectura de un módulo.",
+  "when": {
+    "type": "postTaskExecution"
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Se acaba de completar una tarea. Verifica que los archivos de spec del módulo afectado están sincronizados con la implementación según .kiro/steering/metodologia-documentacion-specs.md:\n\n1. requirements.md: ¿Los requisitos describen el comportamiento actual (no el planeado)? ¿Las reglas de negocio están vigentes?\n2. design.md: ¿Los tipos TypeScript coinciden con src/types/? ¿Los endpoints documentados coinciden con las rutas reales? ¿Los componentes listados existen?\n3. tasks.md: ¿La tarea recién completada está marcada con [x]? ¿Las tareas pendientes reflejan trabajo real por hacer?\n\nSi hay diferencias entre el spec y la implementación, actualiza el spec. El spec es la fuente de verdad del módulo."
+  }
+}

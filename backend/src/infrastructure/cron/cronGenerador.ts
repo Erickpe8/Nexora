@@ -1,12 +1,16 @@
 import cron from 'node-cron'
 import { ejecutarCicloOrquestadorGeneracionIA } from '../../services/orquestadorGeneracionIA.servicio'
 import { registrarLogGeneracion } from '../observability/registroGeneracionIA'
+import { registro } from '../../shared/logger/registro'
+
+const CONTEXTO = 'CronGenerador'
 
 let enEjecucion = false
 let fallosConsecutivos = 0
 
 const ejecutarCicloGeneracion = async (): Promise<void> => {
   if (enEjecucion) {
+    registro.advertencia(CONTEXTO, 'Ciclo anterior aún en ejecución — omitiendo solapamiento')
     return
   }
 
@@ -17,9 +21,7 @@ const ejecutarCicloGeneracion = async (): Promise<void> => {
 
     if (resultado.guardadas > 0) {
       fallosConsecutivos = 0
-    } else if (resultado.guardadas === 0 && resultado.intentadas > 0) {
-      fallosConsecutivos += 1
-    } else if (resultado.guardadas === 0 && resultado.intentadas === 0 && resultado.errores.length > 0) {
+    } else if (resultado.errores.length > 0) {
       fallosConsecutivos += 1
     }
 
@@ -34,7 +36,9 @@ const ejecutarCicloGeneracion = async (): Promise<void> => {
     })
 
     if (fallosConsecutivos >= 3) {
-      console.error('⚠️ IA: 3 ciclos consecutivos fallaron completamente')
+      registro.error(CONTEXTO, new Error('3 ciclos consecutivos fallaron completamente'), {
+        fallosConsecutivos,
+      })
     }
   } finally {
     enEjecucion = false
@@ -45,4 +49,5 @@ export const iniciarCronGenerador = (): void => {
   cron.schedule('0 * * * *', () => {
     void ejecutarCicloGeneracion()
   })
+  registro.info(CONTEXTO, 'Cron de generación IA iniciado — ejecución cada hora en punto')
 }

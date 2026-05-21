@@ -1,0 +1,13 @@
+{
+  "name": "Validar TypeScript",
+  "version": "1.0.0",
+  "description": "Verifica que el código TypeScript generado o modificado mantiene tipado estricto, sin 'any' sin justificación, interfaces en types/ y patrones correctos de componentes, hooks y servicios.",
+  "when": {
+    "type": "fileEdited",
+    "patterns": ["mobile/src/**/*.ts", "mobile/src/**/*.tsx", "backend/src/**/*.ts"]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Revisa el archivo que acaba de ser editado y verifica que cumple las reglas de TypeScript de Nexora:\n- Sin uso de 'any' sin comentario justificativo\n- Sin 'as any' para silenciar errores\n- Funciones con tipo de retorno explícito cuando no es obvio\n- Props de componentes tipadas con interface propia\n- Respuestas de API tipadas con los tipos de src/types/\n- Sin '@ts-ignore' sin comentario explicativo\n- Interfaces y types definidos en src/types/, no dentro de componentes\n- Estado de hooks tipado explícitamente\nSi encuentras alguna violación, indícala con la línea exacta y la corrección recomendada."
+  }
+}

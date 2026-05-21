@@ -1,5 +1,6 @@
 import fs from 'fs'
 import path from 'path'
+import { registro } from '../../shared/logger/registro'
 
 export interface LogGeneracionIA {
   ejecucionId: string
@@ -24,13 +25,29 @@ const asegurarArchivo = (): void => {
 }
 
 export const registrarLogGeneracion = (log: LogGeneracionIA): void => {
-  asegurarArchivo()
-  const linea = `${JSON.stringify(log)}\n`
-  fs.appendFileSync(rutaLog, linea, 'utf8')
-  console.log(
-    `🤖 IA | ejecucion=${log.ejecucionId} guardadas=${log.publicacionesGuardadas} descartadas=${log.publicacionesDescartadas} duracion=${log.duracionMs}ms`
-  )
+  // Persistir en archivo de log rotativo
+  try {
+    asegurarArchivo()
+    fs.appendFileSync(rutaLog, `${JSON.stringify(log)}\n`, 'utf8')
+  } catch {
+    registro.advertencia('RegistroGeneracionIA', 'No se pudo escribir en logs/generacion.log')
+  }
+
+  // Emitir al logger estructurado
+  const nivel = log.errores.length > 0 && log.publicacionesGuardadas === 0 ? 'advertencia' : 'info'
+  registro[nivel]('GeneracionIA', 'Ciclo completado', {
+    ejecucionId: log.ejecucionId,
+    intentadas: log.publicacionesIntentadas,
+    guardadas: log.publicacionesGuardadas,
+    descartadas: log.publicacionesDescartadas,
+    errores: log.errores.length,
+    duracionMs: log.duracionMs,
+  })
+
   if (log.errores.length > 0) {
-    console.warn(`🤖 IA | errores: ${log.errores.join(' | ')}`)
+    registro.advertencia('GeneracionIA', 'Errores en ciclo', {
+      ejecucionId: log.ejecucionId,
+      errores: log.errores,
+    })
   }
 }

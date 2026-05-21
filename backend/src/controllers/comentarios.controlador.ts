@@ -9,7 +9,8 @@ export const controladorObtenerComentarios = async (
 ): Promise<void> => {
   try {
     const publicacionId = Number(req.params.id)
-    const datos = await obtenerComentariosPublicacion(publicacionId)
+    const { id: usuarioId } = (req as RequestAutenticado).usuario
+    const datos = await obtenerComentariosPublicacion(publicacionId, usuarioId)
     res.status(200).json({ datos })
   } catch (error) {
     next(error)

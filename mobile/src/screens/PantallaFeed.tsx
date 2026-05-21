@@ -1,28 +1,93 @@
 import React from 'react'
-import { View, SafeAreaView, FlatList } from 'react-native'
-import type { NativeStackScreenProps } from '@react-navigation/native-stack'
-import type { ParamsFeed } from '../types/navegacion'
-import { BannerNuevasPublicaciones, CargadorFeed, EstadoVacio, TarjetaPublicacion, Texto } from '../components'
+
+import { SafeAreaView } from 'react-native-safe-area-context'
+
+import {
+  View,
+  FlatList,
+} from 'react-native'
+
+import type {
+  NativeStackScreenProps,
+} from '@react-navigation/native-stack'
+
+import type {
+  ParamsFeed,
+} from '../types/navegacion'
+
+import {
+  BannerNuevasPublicaciones,
+  BarraBusqueda,
+  CargadorFeed,
+  EstadoVacio,
+  TarjetaPublicacion,
+  Texto,
+} from '../components'
+
 import { useAutenticacion } from '../hooks/useAutenticacion'
+
 import { useFeed } from '../hooks/useFeed'
+
 import { usePublicacionesNuevas } from '../hooks/usePublicacionesNuevas'
 
-type Props = NativeStackScreenProps<ParamsFeed, 'Feed'>
+type Props = NativeStackScreenProps<
+  ParamsFeed,
+  'Feed'
+>
 
-const PantallaFeed = ({ navigation }: Props) => {
-  const { token } = useAutenticacion()
-  const { publicaciones, cargando, error, cargar, cargarMas, refrescar, hayMas } = useFeed(token)
-  const { hayNuevas, cantidad, limpiar } = usePublicacionesNuevas()
+const PantallaFeed = ({
+  navigation,
+}: Props) => {
+  const { token } =
+    useAutenticacion()
+
+  const {
+    publicaciones,
+    cargando,
+    error,
+    cargar,
+    cargarMas,
+    refrescar,
+    hayMas,
+    terminoBusqueda,
+    buscar,
+    limpiarBusqueda,
+  } = useFeed(token)
+
+  const {
+    hayNuevas,
+    cantidad,
+    limpiar,
+  } = usePublicacionesNuevas()
 
   React.useEffect(() => {
     void cargar()
   }, [cargar])
 
   return (
-    <SafeAreaView className="flex-1 bg-fondo">
-      <Texto variante="titulo" className="px-4 pt-4 pb-2">Nexora</Texto>
+    <SafeAreaView
+      className="flex-1 bg-fondo"
+      edges={['top']}
+    >
+      <Texto
+        variante="titulo"
+        className="px-4 pt-4 pb-2"
+      >
+        Nexora
+      </Texto>
 
-      {hayNuevas ? (
+      <BarraBusqueda
+        valor={terminoBusqueda}
+        onBuscar={termino =>
+          void buscar(termino)
+        }
+        onLimpiar={() =>
+          void limpiarBusqueda()
+        }
+      />
+
+      {hayNuevas &&
+      !terminoBusqueda ? (
         <BannerNuevasPublicaciones
           cantidad={cantidad}
           onPress={() => {
@@ -32,25 +97,59 @@ const PantallaFeed = ({ navigation }: Props) => {
         />
       ) : null}
 
-      {cargando && publicaciones.length === 0 ? (
+      {cargando &&
+      publicaciones.length === 0 ? (
         <CargadorFeed />
       ) : (
         <FlatList
           data={publicaciones}
-          keyExtractor={item => String(item.id)}
-          contentContainerStyle={{ padding: 16 }}
+          keyExtractor={item =>
+            String(item.id)
+          }
+          contentContainerStyle={{
+            padding: 16,
+            paddingBottom: 140,
+          }}
+          showsVerticalScrollIndicator={
+            false
+          }
+          contentInsetAdjustmentBehavior="automatic"
+          keyboardShouldPersistTaps="handled"
           renderItem={({ item }) => (
-            <TarjetaPublicacion publicacion={item} onPress={() => navigation.navigate('Detalle', { publicacionId: item.id })} />
+            <TarjetaPublicacion
+              publicacion={item}
+              onPress={() =>
+                navigation.navigate(
+                  'Detalle',
+                  {
+                    publicacionId:
+                      item.id,
+                  }
+                )
+              }
+            />
           )}
           onEndReached={() => {
-            if (hayMas) void cargarMas()
+            if (hayMas) {
+              void cargarMas()
+            }
           }}
           onEndReachedThreshold={0.5}
-          onRefresh={() => void refrescar()}
+          onRefresh={() =>
+            void refrescar()
+          }
           refreshing={cargando}
           ListEmptyComponent={
             <View className="mt-10">
-              <EstadoVacio mensaje={error ? 'Error al cargar feed' : 'No hay publicaciones aún'} />
+              <EstadoVacio
+                mensaje={
+                  error
+                    ? 'Error al cargar feed'
+                    : terminoBusqueda
+                    ? `Sin resultados para "${terminoBusqueda}"`
+                    : 'No hay publicaciones aún'
+                }
+              />
             </View>
           }
         />

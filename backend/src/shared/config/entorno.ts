@@ -2,6 +2,41 @@ import dotenv from 'dotenv'
 
 dotenv.config()
 
+/** Placeholders conocidos que no deben usarse en producción. */
+const PLACEHOLDERS_PROHIBIDOS = new Set([
+  'cambia_este_secreto',
+  'tu_api_key_aqui',
+  'secreto_desarrollo',
+  'changeme',
+  'secret',
+  'your_secret_here',
+])
+
+const esPlaceholder = (valor: string): boolean =>
+  PLACEHOLDERS_PROHIBIDOS.has(valor.toLowerCase().trim())
+
+/**
+ * Valida que una variable de entorno exista y no sea placeholder en producción.
+ * En desarrollo solo advierte; en producción lanza error y detiene el proceso.
+ */
+const requerirEnProd = (nombre: string, valor: string | undefined): string => {
+  if (!valor || valor.trim() === '') {
+    const msg = `[Config] Variable de entorno requerida no definida: ${nombre}`
+    if (process.env.NODE_ENV === 'production') {
+      console.error(msg)
+      process.exit(1)
+    }
+    console.warn(msg)
+    return ''
+  }
+  if (process.env.NODE_ENV === 'production' && esPlaceholder(valor)) {
+    const msg = `[Config] Variable ${nombre} contiene un placeholder prohibido en producción`
+    console.error(msg)
+    process.exit(1)
+  }
+  return valor
+}
+
 const parsearMysqlUrl = (raw: string) => {
   const u = new URL(raw)
   return {
@@ -27,7 +62,7 @@ const resolverDb = () => {
   }
 }
 
-/** Configuración validada en arranque (ver SPEC gestion-configuracion-secretos). */
+/** Configuración validada en arranque (SPEC gestion-configuracion-secretos). */
 export const entorno = {
   puerto: Number(process.env.PUERTO) || 3000,
   nodeEnv: process.env.NODE_ENV || 'development',
@@ -35,12 +70,25 @@ export const entorno = {
   db: resolverDb(),
 
   jwt: {
-    secreto: process.env.JWT_SECRETO || 'secreto_desarrollo',
+    secreto: requerirEnProd('JWT_SECRETO', process.env.JWT_SECRETO) || 'secreto_desarrollo',
     expiracion: process.env.JWT_EXPIRACION || '7d',
   },
 
   deepseek: {
-    apiKey: process.env.DEEPSEEK_API_KEY || '',
+    apiKey: requerirEnProd('DEEPSEEK_API_KEY', process.env.DEEPSEEK_API_KEY) || '',
     url: process.env.DEEPSEEK_URL || 'https://api.deepseek.com/v1/chat/completions',
   },
-}
+
+  /** API key interna para el endpoint /api/interno/ia/generar */
+  interno: {
+    apiKey: process.env.INTERNO_API_KEY || 'nexora_interno_dev',
+  },
+
+  /** Flag para habilitar moderación automática por umbral de denuncias */
+  moderacion: {
+    umbralAutoDenuncias: Number(process.env.MODERACION_UMBRAL_DENUNCIAS) || 5,
+    habilitarAutoOcultar: process.env.MODERACION_AUTO_OCULTAR === 'true',
+  },
+} as const
+
+export type ConfigNexora = typeof entorno

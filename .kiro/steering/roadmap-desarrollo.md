@@ -310,3 +310,71 @@ El usuario puede ver y editar su perfil. Puede ver el perfil público de otros u
 Antes de empezar cualquier fase, leer el `tasks.md` del spec correspondiente.
 Implementar exactamente lo que está documentado, sin agregar funcionalidades extra.
 Al terminar cada fase, marcar el estado como `[x] Completado` en este archivo.
+
+---
+
+## Fase 9 — Observabilidad de Plataforma
+**Spec:** `.kiro/specs/observabilidad-plataforma/tasks.md`
+**Estado:** `[x] Completado`
+**Dependencia:** Fase 1 (backend base)
+
+### Qué se implementó
+- Logger JSON estructurado con niveles (`info`, `advertencia`, `error`, `debug`) en `shared/logger/registro.ts`
+- Sanitización de campos sensibles en logs (contraseñas, tokens, API keys)
+- Middleware de correlación HTTP (`middlewares/correlacion.ts`) con `X-Correlacion-Id` y duración por request
+- Logs estructurados en socket (conexión, desconexión, fallos de handshake JWT, contador de conectados)
+- Logs categorizados en el orquestador IA (errores de red, parseo, 4xx, 5xx)
+- Rutas de salud `/api/salud`, `/api/salud/listo`, `/api/salud/vivo` con chequeo MySQL con timeout
+
+---
+
+## Fase 10 — Gestión de Configuración y Secretos
+**Spec:** `.kiro/specs/gestion-configuracion-secretos/tasks.md`
+**Estado:** `[x] Completado`
+**Dependencia:** Fase 1
+
+### Qué se implementó
+- Módulo único `shared/config/entorno.ts` con validación fail-fast en producción
+- Detección de placeholders prohibidos (`cambia_este_secreto`, `tu_api_key_aqui`, etc.)
+- Variables nuevas documentadas: `INTERNO_API_KEY`, `MODERADOR_IDS`, `MODERACION_UMBRAL_DENUNCIAS`, `MODERACION_AUTO_OCULTAR`
+- `.env.example` actualizado con todas las variables y comentarios claros
+
+---
+
+## Fase 11 — Pipeline de Generación IA (Fase B)
+**Spec:** `.kiro/specs/pipeline-generacion-ia/tasks.md`
+**Estado:** `[x] Completado` (Fases A y B; Fase D pendiente de SPEC cola)
+**Dependencia:** Fases 1, 5, 9
+
+### Qué se implementó
+- Tablas de trazabilidad: `versiones_prompt_ia`, `registros_generacion_ia`, columnas `proveedor_ia`, `version_prompt`, `hash_contenido` en `publicaciones`
+- Semilla inicial del prompt DeepSeek en `versiones_prompt_ia`
+- Deduplicación por hash SHA-256 de contenido (además de título)
+- Registro por ítem en `registros_generacion_ia` (éxito/fallo, duración, ejecucionId)
+- Orquestador con logs estructurados y categorización de errores DeepSeek
+- Endpoint interno protegido `POST /api/interno/ia/generar` con API key + rate limit 5/hora
+- Middleware `autenticacionInterna.ts` para rutas internas
+
+---
+
+## Fase 12 — Moderación y Confianza de Contenido
+**Spec:** `.kiro/specs/moderacion-confianza-contenido/tasks.md`
+**Estado:** `[x] Completado`
+**Dependencia:** Fases 6 (comentarios), 3 (tiempo real), 9 (observabilidad)
+
+### Qué se implementó
+**Backend:**
+- Tabla `denuncias` con índices, deduplicación en ventana 24h, motivos enumerados
+- Extensión de `comentarios` con `estado_moderacion`, `oculto_en`, `moderador_id`, `nota_interna`
+- `servicioDenuncias` con anti-duplicado y auto-ocultar por umbral configurable
+- `servicioModeracion` con transacción DB + emisión Socket (`comentario_oculto` / `comentario_restaurado`)
+- Rutas: `POST /api/comentarios/:id/denuncias`, `GET /api/moderacion/denuncias`, `PATCH /api/moderacion/comentarios/:id`
+- Middleware `requiereModerador` con control por `MODERADOR_IDS` en env
+
+**Mobile:**
+- Tipo `Comentario` extendido con `estadoModeracion`
+- `servicioModeracion.ts`, `useDenuncias.ts`
+- Componente `ModalDenuncia` (bottom sheet con selección de motivo + detalle opcional)
+- `TarjetaComentario` actualizada con botón "Denunciar" y placeholder para comentarios ocultos
+- `useComentariosEnTiempoReal` escucha `comentario_oculto` y `comentario_restaurado`
+- `useComentarios` con `ocultarDesdeTiempoReal` y `restaurarDesdeTiempoReal`

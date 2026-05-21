@@ -6,8 +6,11 @@ export interface Comentario {
   comentarioPadreId: number | null
   contenido: string
   eliminado: boolean
+  estadoModeracion: 'visible' | 'oculto'
   creadoEn: string
   respuestas: Comentario[]
+  totalLikes: number
+  meDioLike: boolean
 }
 
 export interface NuevoComentario {

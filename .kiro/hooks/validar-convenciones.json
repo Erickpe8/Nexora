@@ -1,0 +1,13 @@
+{
+  "name": "Validar Convenciones",
+  "version": "1.0.0",
+  "description": "Verifica que el código generado o modificado cumple las convenciones de Nexora: idioma español, nomenclatura correcta, estructura de carpetas y separación de responsabilidades.",
+  "when": {
+    "type": "fileEdited",
+    "patterns": ["mobile/src/**/*.ts", "mobile/src/**/*.tsx", "backend/src/**/*.ts"]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Revisa el archivo editado y verifica que cumple las convenciones de Nexora definidas en .kiro/steering/convenciones.md:\n- Variables y funciones en español camelCase (ej: nombreUsuario, obtenerPerfil)\n- Interfaces y types en español PascalCase (ej: PerfilUsuario)\n- Componentes en español PascalCase (ej: TarjetaPublicacion)\n- Archivos en español kebab-case (ej: tarjeta-publicacion.tsx)\n- Un componente por archivo\n- Hooks en src/hooks/ con prefijo 'use' en español (ej: useAutenticacion)\n- Servicios en src/services/ con sufijo 'servicio' (ej: servicioAuth)\n- Sin estilos inline con StyleSheet (usar NativeWind en mobile)\n- Sin llamadas axios directamente desde componentes (usar servicios)\n- Sin lógica de negocio dentro de componentes de UI\n- Comentarios en español\nSi encuentras alguna violación, indícala con la línea exacta y la corrección recomendada."
+  }
+}

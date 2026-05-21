@@ -7,7 +7,8 @@
     "dev": "nodemon --exec \"node --disable-warning=DEP0169 -r ts-node/register\" src/server.ts",
     "build": "npx tsc",
     "start": "node dist/server.js",
-    "tablas": "ts-node src/infrastructure/database/crearTablas.ts"
+    "tablas": "ts-node src/infrastructure/database/crearTablas.ts",
+    "migrar": "ts-node src/infrastructure/database/migrarTablas.ts"
   },
   "dependencies": {
     "axios": "^1.7.9",
