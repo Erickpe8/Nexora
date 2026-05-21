@@ -8,8 +8,13 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "tablas": "npm run tablas --prefix backend",
-    "vercel-install": "npm install --prefix backend && npm install --prefix mobile",
-    "vercel-build": "node scripts/vercel-build.cjs"
+    "vercel-install": "npm install --include=dev --prefix backend && npm install --include=dev --prefix mobile",
+    "vercel-build": "node scripts/vercel-build.cjs",
+    "vercel:prepare": "node scripts/prepare-vercel-env.cjs",
+    "vercel:env": "node scripts/vercel-env-push.cjs",
+    "vercel:env:dry": "node scripts/vercel-env-push.cjs --dry-run",
+    "vercel:deploy": "npm run vercel:prepare && npm run vercel:env",
+    "vercel:finalizar": "node scripts/finalizar-deploy-vercel.cjs"
   },
   "dependencies": {
     "expo": "~54.0.33",
@@ -19,7 +24,8 @@
   },
   "devDependencies": {
     "@types/react": "~19.1.0",
-    "typescript": "~5.9.2"
+    "typescript": "~5.9.2",
+    "vercel": "^54.3.0"
   },
   "private": true
 }

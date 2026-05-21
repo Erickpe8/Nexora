@@ -3,13 +3,30 @@
 # dependencies
 node_modules/
 
-# Expo
-.expo/
+# --- Secretos y variables locales (NUNCA subir) ---
+**/.env
+!**/.env.example
+db.remote.env
+.env.vercel
+.env*.local
+
+# Vercel (enlace local al proyecto; las env van en el panel de Vercel)
+.vercel/
+
+# --- Builds y caché ---
+backend/dist/
+mobile/dist/
 dist/
 web-build/
+.expo/
 expo-env.d.ts
+*.tsbuildinfo
 
-# Native
+# Logs
+backend/logs/
+*.log
+
+# Expo / native
 .kotlin/
 *.orig.*
 *.jks
@@ -17,6 +34,8 @@ expo-env.d.ts
 *.p12
 *.key
 *.mobileprovision
+/ios
+/android
 
 # Metro
 .metro-health-check*
@@ -29,13 +48,3 @@ yarn-error.*
 # macOS
 .DS_Store
 *.pem
-
-# local env files
-.env*.local
-
-# typescript
-*.tsbuildinfo
-
-# generated native folders
-/ios
-/android

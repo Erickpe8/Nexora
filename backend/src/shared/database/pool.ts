@@ -1,6 +1,15 @@
 import mysql from 'mysql2/promise'
 import { entorno } from '../config/entorno'
 
+const usarSsl =
+  process.env.DB_SSL === 'true' ||
+  process.env.DB_SSL === '1' ||
+  process.env.MYSQL_URL?.includes('ssl-mode=REQUIRED') ||
+  process.env.DATABASE_URL?.includes('ssl-mode=REQUIRED')
+
+/** Railway y otros proxies suelen usar certificado intermedio; relax solo si DB_SSL_RELAX=true */
+const sslRelajado = process.env.DB_SSL_RELAX === 'true' || process.env.DB_SSL_RELAX === '1'
+
 export const pool = mysql.createPool({
   host: entorno.db.host,
   port: entorno.db.puerto,
@@ -11,6 +20,9 @@ export const pool = mysql.createPool({
   waitForConnections: true,
   queueLimit: 0,
   timezone: '+00:00',
+  ...(usarSsl
+    ? { ssl: { rejectUnauthorized: !sslRelajado } }
+    : {}),
 })
 
 export const verificarConexion = async (): Promise<void> => {

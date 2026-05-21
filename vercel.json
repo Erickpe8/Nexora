@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "installCommand": "npm run vercel-install",
+  "installCommand": "npm install --include=dev && npm run vercel-install",
   "buildCommand": "npm run vercel-build",
   "outputDirectory": "mobile/dist",
   "cleanUrls": true,
