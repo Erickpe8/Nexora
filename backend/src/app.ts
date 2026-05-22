@@ -24,6 +24,14 @@ import rutasInterno from './routes/interno.rutas'
 export const crearAplicacion = (): Express => {
   const app = express()
 
+  /**
+   * Vercel (y otros reverse proxies) envían X-Forwarded-For.
+   * Sin esto, express-rate-limit lanza ERR_ERL_UNEXPECTED_X_FORWARDED_FOR → 500 en /api/auth/*.
+   */
+  if (process.env.VERCEL) {
+    app.set('trust proxy', 1)
+  }
+
   /** Preflight primero: responde OPTIONS antes de helmet/rutas (crítico en Vercel). */
   app.use(middlewarePreflightVercel)
   app.use(middlewareCors)

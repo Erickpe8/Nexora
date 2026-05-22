@@ -1,4 +1,12 @@
-import rateLimit from 'express-rate-limit'
+import rateLimit, { type Options } from 'express-rate-limit'
+
+/**
+ * En Vercel hay proxy con X-Forwarded-For. Sin `trust proxy` + esta validación desactivada,
+ * express-rate-limit v7 lanza y el cliente ve 500 en /api/auth/*.
+ */
+const opcionesVercelProxy: Partial<Options> = process.env.VERCEL
+  ? { validate: { xForwardedForHeader: false, trustProxy: false } }
+  : {}
 
 // Límite general: 100 peticiones por IP cada 15 minutos
 export const limitadorGeneral = rateLimit({
@@ -10,6 +18,7 @@ export const limitadorGeneral = rateLimit({
     error: 'Demasiadas peticiones. Intenta de nuevo en 15 minutos.',
     codigo: 429,
   },
+  ...opcionesVercelProxy,
 })
 
 // Límite estricto para auth: 10 intentos por IP cada 15 minutos
@@ -22,4 +31,5 @@ export const limitadorAuth = rateLimit({
     error: 'Demasiados intentos de autenticación. Intenta de nuevo en 15 minutos.',
     codigo: 429,
   },
+  ...opcionesVercelProxy,
 })
