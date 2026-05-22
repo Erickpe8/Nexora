@@ -12,4 +12,11 @@ export type {
   ActualizarPerfil,
   RedesSociales,
 } from './perfil'
-export type { NuevaDenuncia, MotivosDenuncia } from './moderacion'
+export type {
+  NuevaDenuncia,
+  MotivosDenuncia,
+  Denuncia,
+  EstadoDenuncia,
+  RespuestaPaginadaDenuncias,
+  AccionModeracion,
+} from './moderacion'

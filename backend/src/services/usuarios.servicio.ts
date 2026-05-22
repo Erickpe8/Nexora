@@ -8,6 +8,14 @@ import type {
   PerfilUsuario,
   RedesSociales,
 } from '../types'
+import { guardarAvatarUsuario } from './archivos.servicio'
+import { usuarioEsModerador } from '../utils/moderador'
+import {
+  generarUsernameDisponible,
+  normalizarUsername,
+  validarFormatoUsername,
+  usernameDisponible,
+} from '../utils/username'
 
 interface PerfilFila extends RowDataPacket {
   id: number
@@ -41,7 +49,7 @@ const CAMPOS_REDES_PERMITIDOS = [
 ] as const
 
 const SELECT_PERFIL = `
-  u.id, u.nombre, u.correo, u.biografia, u.foto_perfil_url, u.fecha_nacimiento, u.redes_sociales, u.creado_en,
+  u.id, u.nombre, COALESCE(u.username, CONCAT('user', u.id)) AS username, u.correo, u.biografia, u.foto_perfil_url, u.fecha_nacimiento, u.redes_sociales, u.creado_en,
   (SELECT COUNT(*) FROM comentarios c WHERE c.usuario_id = u.id AND c.eliminado = FALSE) AS total_comentarios
 `
 
@@ -68,6 +76,7 @@ const formatearFechaNacimiento = (valor: string | Date | null): string | null =>
 const mapearPerfilBase = (fila: PerfilFila) => ({
   id: fila.id,
   nombre: fila.nombre,
+  username: fila.username,
   biografia: fila.biografia?.trim() || null,
   fotoPerfilUrl: fila.foto_perfil_url?.trim() || null,
   fechaNacimiento: formatearFechaNacimiento(fila.fecha_nacimiento),
@@ -79,6 +88,7 @@ const mapearPerfilBase = (fila: PerfilFila) => ({
 const mapearPerfilUsuario = (fila: PerfilFila): PerfilUsuario => ({
   ...mapearPerfilBase(fila),
   correo: fila.correo,
+  esModerador: usuarioEsModerador(fila.id),
 })
 
 const mapearPerfilPublico = (fila: PerfilFila): PerfilPublico => mapearPerfilBase(fila)
@@ -184,6 +194,16 @@ export const actualizarPerfil = async (
     params.push(nombreLimpio)
   }
 
+  if (datos.username !== undefined) {
+    const usernameLimpio = normalizarUsername(datos.username.trim())
+    validarFormatoUsername(usernameLimpio)
+    if (!(await usernameDisponible(usernameLimpio, usuarioId))) {
+      throw new ErrorHttp('El username ya está en uso', 409)
+    }
+    sets.push('username = ?')
+    params.push(usernameLimpio)
+  }
+
   if (datos.biografia !== undefined) {
     const bio = datos.biografia?.trim() ?? ''
     if (bio.length > 500) {
@@ -227,6 +247,15 @@ export const actualizarPerfil = async (
   )
 
   return obtenerPerfilPropio(usuarioId)
+}
+
+export const subirFotoPerfil = async (
+  usuarioId: number,
+  buffer: Buffer,
+  mime: string
+): Promise<PerfilUsuario> => {
+  const url = await guardarAvatarUsuario(usuarioId, buffer, mime)
+  return actualizarPerfil(usuarioId, { fotoPerfilUrl: url })
 }
 
 /** @deprecated Usar actualizarPerfil */

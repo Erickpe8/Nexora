@@ -32,6 +32,7 @@ export interface OpcionesGuardarSesion {
 
 interface AccionesAuth {
   guardarSesion: (token: string, usuario: Usuario, opciones?: OpcionesGuardarSesion) => Promise<void>
+  actualizarUsuario: (parcial: Partial<Usuario>) => Promise<void>
   cerrarSesion: () => Promise<void>
 }
 
@@ -74,6 +75,15 @@ export const ProveedorAutenticacion = ({ children }: { children: ReactNode }) =>
     setEstado({ token, usuario, cargando: false })
   }, [])
 
+  const actualizarUsuario = useCallback(async (parcial: Partial<Usuario>) => {
+    setEstado(prev => {
+      if (!prev.usuario || !prev.token) return prev
+      const usuario = { ...prev.usuario, ...parcial }
+      void guardarUsuarioEnCache(usuario)
+      return { ...prev, usuario }
+    })
+  }, [])
+
   const cerrarSesion = useCallback(async () => {
     await limpiarPersistenciaSesion()
     setEstado({ usuario: null, token: null, cargando: false })
@@ -97,9 +107,10 @@ export const ProveedorAutenticacion = ({ children }: { children: ReactNode }) =>
     () => ({
       ...estado,
       guardarSesion,
+      actualizarUsuario,
       cerrarSesion,
     }),
-    [estado, guardarSesion, cerrarSesion]
+    [estado, guardarSesion, actualizarUsuario, cerrarSesion]
   )
 
   return <ContextoAuth.Provider value={valor}>{children}</ContextoAuth.Provider>

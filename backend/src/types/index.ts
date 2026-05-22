@@ -10,6 +10,7 @@ export interface UsuarioToken {
 export interface Usuario {
   id: number
   nombre: string
+  username: string
   correo: string
   creadoEn: string
 }
@@ -26,21 +27,31 @@ export interface CredencialesLogin {
 
 export interface DatosRegistro {
   nombre: string
+  username?: string
   correo: string
   contrasena: string
 }
 
 export interface Publicacion {
   id: number
+  slug: string
   titulo: string
   resumen: string
+  contenidoExpandido: string | null
   pregunta: string
+  categoria: string | null
   etiquetas: string[]
+  fuenteUrl: string | null
+  imagenUrl: string | null
+  relevancia: number
   generadoPorIa: boolean
   creadoEn: string
   totalComentarios: number
   totalReacciones: number
   miReaccion: TipoReaccion | null
+  compartidosCount: number
+  guardadoPorMi: boolean
+  leerDespues: boolean
 }
 
 export interface RespuestaFeed {
@@ -92,6 +103,7 @@ export interface Comentario {
   publicacionId: number
   usuarioId: number
   nombreUsuario: string
+  username: string
   comentarioPadreId: number | null
   contenido: string
   eliminado: boolean
@@ -133,6 +145,7 @@ export interface RedesSociales {
 export interface PerfilBase {
   id: number
   nombre: string
+  username: string
   biografia: string | null
   fotoPerfilUrl: string | null
   fechaNacimiento: string | null
@@ -143,12 +156,14 @@ export interface PerfilBase {
 
 export interface PerfilUsuario extends PerfilBase {
   correo: string
+  esModerador: boolean
 }
 
 export interface PerfilPublico extends PerfilBase {}
 
 export interface ActualizarPerfilDto {
   nombre?: string
+  username?: string
   biografia?: string | null
   fotoPerfilUrl?: string | null
   fechaNacimiento?: string | null
@@ -187,6 +202,8 @@ export interface Denuncia {
   detalle: string | null
   estado: EstadoDenuncia
   creadoEn: string
+  /** Presente en listados de moderación cuando el objetivo es un comentario. */
+  publicacionId?: number
 }
 
 export interface RespuestaPaginadaDenuncias {

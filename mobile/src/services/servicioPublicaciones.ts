@@ -16,4 +16,12 @@ export const servicioPublicaciones = {
     })
     return respuesta.data.datos
   },
+
+  async obtenerPorSlug(token: string, slug: string): Promise<Publicacion> {
+    const respuesta = await clienteApi.get<RespuestaDatos<Publicacion>>(
+      `/publicaciones/slug/${encodeURIComponent(slug)}`,
+      { headers: { Authorization: `Bearer ${token}` } }
+    )
+    return respuesta.data.datos
+  },
 }

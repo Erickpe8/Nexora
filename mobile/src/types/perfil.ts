@@ -12,6 +12,7 @@ export interface RedesSociales {
 export interface PerfilBase {
   id: number
   nombre: string
+  username: string
   biografia: string | null
   fotoPerfilUrl: string | null
   fechaNacimiento: string | null
@@ -22,6 +23,7 @@ export interface PerfilBase {
 
 export interface PerfilUsuario extends PerfilBase {
   correo: string
+  esModerador: boolean
 }
 
 export interface PerfilPublico extends PerfilBase {}
@@ -38,6 +40,7 @@ export interface ItemHistorial {
 
 export interface ActualizarPerfil {
   nombre?: string
+  username?: string
   biografia?: string | null
   fotoPerfilUrl?: string | null
   fechaNacimiento?: string | null

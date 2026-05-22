@@ -9,6 +9,7 @@ import NavegadorPrincipal from './NavegadorPrincipal'
 import RutaProtegida from './RutaProtegida'
 import { Cargador } from '../components'
 import { colores } from '../styles'
+import { configuracionLinking } from './configuracionLinking'
 
 const Stack = createNativeStackNavigator<ParamsRaiz>()
 
@@ -44,7 +45,7 @@ const NavegadorRaiz = () => {
   }
 
   return (
-    <NavigationContainer theme={temaNexora}>
+    <NavigationContainer theme={temaNexora} linking={configuracionLinking}>
       <Stack.Navigator screenOptions={{ headerShown: false, animation: 'none' }}>
         {usuario ? (
           <Stack.Screen name="Principal">

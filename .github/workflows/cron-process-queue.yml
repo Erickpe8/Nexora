@@ -1,0 +1,25 @@
+# Drena la cola de trabajos (generación IA, tendencias, etc.)
+# GitHub Actions: mínimo cada 5 minutos en repos públicos.
+name: Cron — Procesar cola
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: cron-process-queue
+  cancel-in-progress: false
+
+jobs:
+  invoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/cron-invoke
+        with:
+          api-url: ${{ secrets.NEXORA_API_URL }}
+          cron-secret: ${{ secrets.CRON_SECRET }}
+          path: '/api/internal/cron/process-queue?max=2'
+          timeout-seconds: '300'

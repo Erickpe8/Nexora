@@ -1,14 +1,23 @@
 export interface Publicacion {
   id: number
+  slug: string
   titulo: string
   resumen: string
+  contenidoExpandido: string | null
   pregunta: string
+  categoria: string | null
   etiquetas: string[]
+  fuenteUrl: string | null
+  imagenUrl: string | null
+  relevancia: number
   generadoPorIa: boolean
   creadoEn: string
   totalComentarios: number
   totalReacciones: number
   miReaccion: TipoReaccion | null
+  compartidosCount: number
+  guardadoPorMi: boolean
+  leerDespues: boolean
 }
 
 export interface RespuestaFeed {

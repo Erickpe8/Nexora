@@ -11,6 +11,7 @@ interface ComentarioFila extends RowDataPacket {
   publicacion_id: number
   usuario_id: number
   nombre_usuario: string
+  username: string
   comentario_padre_id: number | null
   contenido: string
   eliminado: number
@@ -35,6 +36,7 @@ const selectComentarios = async (): Promise<{
   return {
     incluyeUsuarioEnParams: conLikes,
     sql: `SELECT c.id, c.publicacion_id, c.usuario_id, u.nombre AS nombre_usuario,
+            COALESCE(u.username, CONCAT('user', u.id)) AS username,
             c.comentario_padre_id, c.contenido, c.eliminado, ${estadoModeracion}, c.creado_en,
             ${camposLikes}
      FROM comentarios c
@@ -47,6 +49,7 @@ const mapearComentario = (fila: ComentarioFila): Comentario => ({
   publicacionId: fila.publicacion_id,
   usuarioId: fila.usuario_id,
   nombreUsuario: fila.nombre_usuario,
+  username: fila.username,
   comentarioPadreId: fila.comentario_padre_id,
   contenido: Boolean(fila.eliminado) ? '[comentario eliminado]' : fila.contenido,
   eliminado: Boolean(fila.eliminado),

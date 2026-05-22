@@ -1,0 +1,40 @@
+name: 'Invocar endpoint cron Nexora'
+description: 'POST autenticado a /api/internal/cron/*'
+inputs:
+  api-url:
+    description: 'URL base de la API (sin barra final), ej. https://nexora.vercel.app'
+    required: true
+  cron-secret:
+    description: 'CRON_SECRET (Bearer token)'
+    required: true
+  path:
+    description: 'Ruta relativa, ej. /api/internal/cron/process-queue?max=2'
+    required: true
+  timeout-seconds:
+    description: 'Timeout HTTP'
+    required: false
+    default: '120'
+runs:
+  using: 'composite'
+  steps:
+    - name: Invocar cron
+      shell: bash
+      run: |
+        set -euo pipefail
+        BASE="${{ inputs.api-url }}"
+        BASE="${BASE%/}"
+        URL="${BASE}${{ inputs.path }}"
+        echo "→ POST ${URL}"
+        HTTP_CODE=$(curl -sS -o /tmp/cron-body.json -w "%{http_code}" \
+          -X POST "${URL}" \
+          -H "Authorization: Bearer ${{ inputs.cron-secret }}" \
+          -H "X-Cron-Origen: github-actions" \
+          -H "Content-Type: application/json" \
+          --max-time "${{ inputs.timeout-seconds }}" \
+          -d '{}')
+        echo "HTTP ${HTTP_CODE}"
+        cat /tmp/cron-body.json | head -c 4000
+        echo ""
+        if [ "${HTTP_CODE}" -lt 200 ] || [ "${HTTP_CODE}" -ge 300 ]; then
+          exit 1
+        fi

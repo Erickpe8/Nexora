@@ -10,15 +10,14 @@ import type {
   NativeStackScreenProps,
 } from '@react-navigation/native-stack'
 
-import type {
-  ParamsFeed,
-} from '../types/navegacion'
+import type { ParamsDetalleYPerfil } from '../types/navegacion'
 
 import type {
   Publicacion,
 } from '../types'
 
 import {
+  AccionesEngagement,
   Cargador,
   ListaComentarios,
   Texto,
@@ -31,11 +30,9 @@ import { servicioPublicaciones } from '../services/servicioPublicaciones'
 import { useComentarios } from '../hooks/useComentarios'
 
 import { useComentariosEnTiempoReal } from '../hooks/useComentariosEnTiempoReal'
+import { usePollingSinSocket } from '../hooks/usePollingSinSocket'
 
-type Props = NativeStackScreenProps<
-  ParamsFeed,
-  'Detalle'
->
+type Props = NativeStackScreenProps<ParamsDetalleYPerfil, 'Detalle'>
 
 const PantallaDetalle = ({
   route,
@@ -52,13 +49,12 @@ const PantallaDetalle = ({
   const [cargando, setCargando] =
     React.useState(false)
 
-  const publicacionId =
-    route.params.publicacionId
+  const publicacionId = route.params.publicacionId
+  const slugParam = route.params.slug
 
-  const comentarios = useComentarios(
-    token,
-    publicacionId
-  )
+  const idPublicacion = publicacion?.id ?? publicacionId ?? 0
+
+  const comentarios = useComentarios(token, idPublicacion)
 
   const {
     cargar: cargarComentarios,
@@ -73,7 +69,7 @@ const PantallaDetalle = ({
   } = comentarios
 
   useComentariosEnTiempoReal(
-    publicacionId,
+    idPublicacion,
     comentario =>
       insertarDesdeTiempoReal(
         comentario
@@ -86,32 +82,28 @@ const PantallaDetalle = ({
       restaurarDesdeTiempoReal(id)
   )
 
-  React.useEffect(() => {
-    const cargar = async () => {
-      if (!token) return
-
-      setCargando(true)
-
-      try {
-        const datos =
-          await servicioPublicaciones.obtenerDetalle(
-            token,
-            publicacionId
-          )
-
-        setPublicacion(datos)
-      } finally {
-        setCargando(false)
-      }
+  const recargarDetalle = React.useCallback(async () => {
+    if (!token) return
+    setCargando(true)
+    try {
+      const datos = slugParam
+        ? await servicioPublicaciones.obtenerPorSlug(token, slugParam)
+        : await servicioPublicaciones.obtenerDetalle(token, publicacionId ?? 0)
+      setPublicacion(datos)
+    } finally {
+      setCargando(false)
     }
+  }, [token, publicacionId, slugParam])
 
-    void cargar()
-    void cargarComentarios()
-  }, [
-    token,
-    publicacionId,
-    cargarComentarios,
-  ])
+  React.useEffect(() => {
+    void recargarDetalle()
+  }, [recargarDetalle])
+
+  React.useEffect(() => {
+    if (idPublicacion > 0) void cargarComentarios()
+  }, [idPublicacion, cargarComentarios])
+
+  usePollingSinSocket(() => void cargarComentarios(), 30_000, Boolean(token))
 
   return (
     <SafeAreaView
@@ -161,7 +153,11 @@ const PantallaDetalle = ({
             {publicacion.pregunta}
           </Texto>
 
+          <AccionesEngagement publicacion={publicacion} />
+
           <ListaComentarios
+            slugPublicacion={publicacion.slug}
+            tituloPublicacion={publicacion.titulo}
             comentarios={
               listaComentarios
             }

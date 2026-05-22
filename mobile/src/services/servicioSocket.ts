@@ -25,7 +25,9 @@ export const servicioSocket = {
       reconnection: true,
       reconnectionDelay: 1000,
       reconnectionDelayMax: 10000,
-      transports: ['websocket'],
+      reconnectionAttempts: 8,
+      timeout: 15_000,
+      transports: ['polling', 'websocket'],
     })
     return socketInstancia
   },

@@ -6,7 +6,9 @@ import {
   obtenerHistorialComentarios,
   obtenerPerfilPropio,
   obtenerPerfilPublico,
+  subirFotoPerfil,
 } from '../services/usuarios.servicio'
+import { ErrorHttp } from '../shared/errors/errorHttp'
 
 export const controladorPerfilPropio = async (
   req: Request,
@@ -50,6 +52,24 @@ export const controladorPerfilPublico = async (
 ): Promise<void> => {
   try {
     const datos = await obtenerPerfilPublico(Number(req.params.id))
+    res.status(200).json({ datos })
+  } catch (error) {
+    next(error)
+  }
+}
+
+export const controladorSubirFotoPerfil = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const { id } = (req as RequestAutenticado).usuario
+    const archivo = req.file
+    if (!archivo?.buffer) {
+      throw new ErrorHttp('Debes enviar un archivo en el campo "foto"', 400)
+    }
+    const datos = await subirFotoPerfil(id, archivo.buffer, archivo.mimetype)
     res.status(200).json({ datos })
   } catch (error) {
     next(error)

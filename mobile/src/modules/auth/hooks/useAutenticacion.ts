@@ -6,8 +6,14 @@ import { authApi } from '../services/authApi'
 import { mapearErrorAuth } from '../services/mapAuthError'
 
 export const useAutenticacion = () => {
-  const { usuario, token, cargando: cargandoSesion, guardarSesion, cerrarSesion: limpiarSesionEnContexto } =
-    useContextoAuth()
+  const {
+    usuario,
+    token,
+    cargando: cargandoSesion,
+    guardarSesion,
+    actualizarUsuario,
+    cerrarSesion: limpiarSesionEnContexto,
+  } = useContextoAuth()
   const [cargando, setCargando] = useState(false)
   const operacionEnCurso = useRef(false)
 
@@ -66,6 +72,7 @@ export const useAutenticacion = () => {
     cargando: cargando || cargandoSesion,
     iniciarSesion,
     registrar,
+    actualizarUsuario,
     cerrarSesion,
   }
 }

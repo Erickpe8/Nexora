@@ -4,6 +4,7 @@ const tablas = [
   `CREATE TABLE IF NOT EXISTS usuarios (
     id                INT AUTO_INCREMENT PRIMARY KEY,
     nombre            VARCHAR(30) NOT NULL,
+    username          VARCHAR(30) NOT NULL UNIQUE,
     correo            VARCHAR(255) NOT NULL UNIQUE,
     contrasena        VARCHAR(255) NOT NULL,
     biografia         VARCHAR(500) DEFAULT NULL,
@@ -26,10 +27,17 @@ const tablas = [
 
   `CREATE TABLE IF NOT EXISTS publicaciones (
     id                   INT AUTO_INCREMENT PRIMARY KEY,
+    slug                 VARCHAR(120) UNIQUE,
     titulo               VARCHAR(255) NOT NULL,
     resumen              TEXT NOT NULL,
+    contenido_expandido  TEXT DEFAULT NULL,
     pregunta             VARCHAR(500) NOT NULL,
+    categoria            VARCHAR(50) DEFAULT NULL,
     etiquetas            JSON,
+    fuente_url           VARCHAR(500) DEFAULT NULL,
+    imagen_url           VARCHAR(500) DEFAULT NULL,
+    relevancia           INT DEFAULT 0,
+    compartidos_count    INT NOT NULL DEFAULT 0,
     generado_por_ia      BOOLEAN DEFAULT TRUE,
     proveedor_ia         VARCHAR(50) DEFAULT 'deepseek',
     version_prompt       VARCHAR(20) DEFAULT NULL,
@@ -108,6 +116,57 @@ const tablas = [
     clave VARCHAR(64) PRIMARY KEY,
     valor VARCHAR(255) NOT NULL,
     actualizado_en DATETIME DEFAULT NOW()
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`,
+
+  `CREATE TABLE IF NOT EXISTS publicaciones_guardadas (
+    id             INT AUTO_INCREMENT PRIMARY KEY,
+    usuario_id     INT NOT NULL,
+    publicacion_id INT NOT NULL,
+    leer_despues   BOOLEAN NOT NULL DEFAULT FALSE,
+    creado_en      DATETIME DEFAULT NOW(),
+    FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE,
+    FOREIGN KEY (publicacion_id) REFERENCES publicaciones(id) ON DELETE CASCADE,
+    UNIQUE KEY uq_guardado (usuario_id, publicacion_id),
+    INDEX idx_guardados_usuario (usuario_id, creado_en)
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`,
+
+  `CREATE TABLE IF NOT EXISTS compartidos_eventos (
+    id             INT AUTO_INCREMENT PRIMARY KEY,
+    tipo_objetivo  ENUM('publicacion','comentario') NOT NULL,
+    objetivo_id    INT NOT NULL,
+    usuario_id     INT DEFAULT NULL,
+    canal          VARCHAR(32) NOT NULL DEFAULT 'otro',
+    creado_en      DATETIME DEFAULT NOW(),
+    FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE SET NULL,
+    INDEX idx_compartidos_objetivo (tipo_objetivo, objetivo_id, creado_en),
+    INDEX idx_compartidos_usuario (usuario_id, creado_en)
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`,
+
+  `CREATE TABLE IF NOT EXISTS cola_trabajos (
+    id             INT AUTO_INCREMENT PRIMARY KEY,
+    tipo           VARCHAR(64) NOT NULL,
+    payload        JSON DEFAULT NULL,
+    estado         ENUM('pendiente','procesando','completado','fallido') NOT NULL DEFAULT 'pendiente',
+    intentos       INT NOT NULL DEFAULT 0,
+    max_intentos   INT NOT NULL DEFAULT 3,
+    error_mensaje  TEXT DEFAULT NULL,
+    creado_en      DATETIME DEFAULT NOW(),
+    procesado_en   DATETIME DEFAULT NULL,
+    INDEX idx_cola_estado (estado, creado_en),
+    INDEX idx_cola_tipo (tipo)
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`,
+
+  `CREATE TABLE IF NOT EXISTS cron_ejecuciones (
+    id           INT AUTO_INCREMENT PRIMARY KEY,
+    tipo         VARCHAR(64) NOT NULL,
+    origen       VARCHAR(64) NOT NULL DEFAULT 'desconocido',
+    exito        BOOLEAN NOT NULL DEFAULT FALSE,
+    duracion_ms  INT NOT NULL DEFAULT 0,
+    mensaje      VARCHAR(500) DEFAULT NULL,
+    detalle      JSON DEFAULT NULL,
+    creado_en    DATETIME DEFAULT NOW(),
+    INDEX idx_cron_tipo (tipo, creado_en),
+    INDEX idx_cron_exito (exito, creado_en)
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`,
 ]
 

@@ -4,10 +4,17 @@ import { generarToken } from '../utils/jwt'
 import { ErrorHttp } from '../shared/errors/errorHttp'
 import type { DatosRegistro, CredencialesLogin, RespuestaAuth, Usuario } from '../types'
 import type { ResultSetHeader, RowDataPacket } from 'mysql2/promise'
+import {
+  generarUsernameDisponible,
+  normalizarUsername,
+  validarFormatoUsername,
+  usernameDisponible,
+} from '../utils/username'
 
 interface UsuarioFila extends RowDataPacket {
   id: number
   nombre: string
+  username: string
   correo: string
   contrasena: string
   creado_en: string
@@ -16,6 +23,7 @@ interface UsuarioFila extends RowDataPacket {
 const convertirUsuario = (fila: UsuarioFila): Usuario => ({
   id: fila.id,
   nombre: fila.nombre,
+  username: fila.username,
   correo: fila.correo,
   creadoEn: fila.creado_en,
 })
@@ -36,13 +44,21 @@ export const registrarUsuario = async (datos: DatosRegistro): Promise<RespuestaA
 
   const hashContrasena = await bcrypt.hash(contrasena, 10)
 
+  let username = datos.username?.trim()
+    ? normalizarUsername(datos.username.trim())
+    : await generarUsernameDisponible(nombre)
+  validarFormatoUsername(username)
+  if (!(await usernameDisponible(username))) {
+    throw new ErrorHttp('El username ya está en uso', 409)
+  }
+
   const [resultado] = await pool.execute<ResultSetHeader>(
-    'INSERT INTO usuarios (nombre, correo, contrasena) VALUES (?, ?, ?)',
-    [nombre, correo, hashContrasena]
+    'INSERT INTO usuarios (nombre, username, correo, contrasena) VALUES (?, ?, ?, ?)',
+    [nombre, username, correo, hashContrasena]
   )
 
   const [filasUsuario] = await pool.execute<UsuarioFila[]>(
-    'SELECT id, nombre, correo, contrasena, creado_en FROM usuarios WHERE id = ? LIMIT 1',
+    'SELECT id, nombre, username, correo, contrasena, creado_en FROM usuarios WHERE id = ? LIMIT 1',
     [resultado.insertId]
   )
 
@@ -65,7 +81,7 @@ export const iniciarSesion = async (credenciales: CredencialesLogin): Promise<Re
   const contrasena = credenciales.contrasena
 
   const [filasUsuario] = await pool.execute<UsuarioFila[]>(
-    'SELECT id, nombre, correo, contrasena, creado_en FROM usuarios WHERE correo = ? LIMIT 1',
+    'SELECT id, nombre, username, correo, contrasena, creado_en FROM usuarios WHERE correo = ? LIMIT 1',
     [correo]
   )
 

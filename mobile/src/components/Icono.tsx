@@ -21,6 +21,10 @@ export type NombreIcono =
   | 'ojo-cerrado'
   | 'alerta'
   | 'confirmar'
+  | 'guardar'
+  | 'guardado'
+  | 'compartir'
+  | 'leer-despues'
 
 const GLIFOS: Record<NombreIcono, keyof typeof Ionicons.glyphMap> = {
   inicio: 'home-outline',
@@ -38,6 +42,10 @@ const GLIFOS: Record<NombreIcono, keyof typeof Ionicons.glyphMap> = {
   'ojo-cerrado': 'eye-off-outline',
   alerta: 'alert-circle-outline',
   confirmar: 'checkmark-circle-outline',
+  guardar: 'bookmark-outline',
+  guardado: 'bookmark',
+  compartir: 'share-outline',
+  'leer-despues': 'time-outline',
 }
 
 export const iconoPorReaccion = (tipo: TipoReaccion): NombreIcono => {

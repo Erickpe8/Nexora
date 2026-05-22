@@ -28,13 +28,17 @@ const main = async () => {
   }
 
   const base = (process.env.VERCEL_PRODUCTION_URL || urlPorDefecto).replace(/\/$/, '')
-  const url = `${base}/api/cron/generar-ia`
+  const url = `${base}/api/internal/cron/generate-news?modo=ejecutar`
 
   console.log(`\n🤖 Disparando generación IA → ${url}\n`)
 
   const res = await fetch(url, {
-    method: 'GET',
-    headers: { Authorization: `Bearer ${secreto}` },
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${secreto}`,
+      'X-Cron-Origen': 'manual',
+      'Content-Type': 'application/json',
+    },
     signal: AbortSignal.timeout(55000),
   })
 

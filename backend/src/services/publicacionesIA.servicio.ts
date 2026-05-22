@@ -2,6 +2,7 @@ import { createHash } from 'crypto'
 import type { ResultSetHeader } from 'mysql2/promise'
 import { pool } from '../shared/database/pool'
 import type { Publicacion, PublicacionIA, ResultadoGeneracion } from '../types'
+import { generarSlugDesdeTitulo } from '../utils/slug'
 import { obtenerPublicacionPorId } from './publicaciones.servicio'
 import { guardarRegistroGeneracion } from './registrosGeneracionIA.servicio'
 
@@ -86,18 +87,28 @@ export const procesarLotePublicacionesIA = async (
     }
 
     try {
+      const categoria = sanitizada.etiquetas[0] ?? 'Tecnología'
+      const relevancia = Math.floor(40 + Math.random() * 60)
+
       const [resultado] = await pool.execute<ResultSetHeader>(
         `INSERT INTO publicaciones
-          (titulo, resumen, pregunta, etiquetas, generado_por_ia, proveedor_ia, hash_contenido)
-         VALUES (?, ?, ?, ?, TRUE, 'deepseek', ?)`,
+          (titulo, resumen, contenido_expandido, pregunta, categoria, etiquetas, generado_por_ia, proveedor_ia, hash_contenido, relevancia)
+         VALUES (?, ?, ?, ?, ?, ?, TRUE, 'deepseek', ?, ?)`,
         [
           sanitizada.titulo,
           sanitizada.resumen,
+          sanitizada.resumen,
           sanitizada.pregunta,
+          categoria,
           JSON.stringify(sanitizada.etiquetas),
           hashContenido,
+          relevancia,
         ]
       )
+
+      const nuevoId = resultado.insertId
+      const slug = generarSlugDesdeTitulo(sanitizada.titulo, nuevoId)
+      await pool.execute('UPDATE publicaciones SET slug = ? WHERE id = ?', [slug, nuevoId])
       guardadas += 1
       const publicacion = await obtenerPublicacionPorId(resultado.insertId, 0)
       publicaciones.push(publicacion)

@@ -19,6 +19,7 @@ import { useAutenticacion } from '../hooks/useAutenticacion'
 import { useNotificaciones } from '../hooks/useNotificaciones'
 
 import { useNotificacionesEnTiempoReal } from '../hooks/useNotificacionesEnTiempoReal'
+import { usePollingSinSocket } from '../hooks/usePollingSinSocket'
 
 import type {
   Notificacion,
@@ -55,6 +56,8 @@ const PantallaNotificaciones = ({
   useNotificacionesEnTiempoReal(
     agregarLocal
   )
+
+  usePollingSinSocket(() => void cargar(), 30_000, Boolean(token))
 
   React.useEffect(() => {
     void cargar()

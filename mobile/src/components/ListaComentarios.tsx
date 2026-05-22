@@ -9,6 +9,8 @@ interface PropsListaComentarios {
   comentarios: Comentario[]
   usuarioActual: Usuario | null
   enviando: boolean
+  slugPublicacion?: string
+  tituloPublicacion?: string
   onEnviar: (contenido: string, comentarioPadreId?: number) => Promise<void>
   onEliminar: (comentarioId: number) => Promise<void>
   onPerfil: (usuarioId: number) => void
@@ -21,6 +23,8 @@ const ListaComentarios = ({
   onEnviar,
   onEliminar,
   onPerfil,
+  slugPublicacion,
+  tituloPublicacion,
 }: PropsListaComentarios) => {
   const [comentarioPadreId, setComentarioPadreId] = useState<number | undefined>(undefined)
 
@@ -35,6 +39,8 @@ const ListaComentarios = ({
           <TarjetaComentario
             comentario={comentario}
             usuarioActual={usuarioActual}
+            slugPublicacion={slugPublicacion}
+            tituloPublicacion={tituloPublicacion}
             onResponder={setComentarioPadreId}
             onEliminar={(id) => void onEliminar(id)}
             onPerfil={onPerfil}

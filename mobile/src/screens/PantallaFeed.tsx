@@ -29,6 +29,7 @@ import { useAutenticacion } from '../hooks/useAutenticacion'
 import { useFeed } from '../hooks/useFeed'
 
 import { usePublicacionesNuevas } from '../hooks/usePublicacionesNuevas'
+import { usePollingSinSocket } from '../hooks/usePollingSinSocket'
 
 type Props = NativeStackScreenProps<
   ParamsFeed,
@@ -54,15 +55,24 @@ const PantallaFeed = ({
     limpiarBusqueda,
   } = useFeed(token)
 
+  const primeraId = publicaciones[0]?.id
   const {
     hayNuevas,
     cantidad,
     limpiar,
-  } = usePublicacionesNuevas()
+  } = usePublicacionesNuevas(token, primeraId, Boolean(terminoBusqueda))
 
   React.useEffect(() => {
     void cargar()
   }, [cargar])
+
+  usePollingSinSocket(
+    () => {
+      if (!terminoBusqueda) void refrescar()
+    },
+    60_000,
+    Boolean(token)
+  )
 
   return (
     <SafeAreaView

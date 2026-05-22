@@ -16,6 +16,23 @@ export const servicioPerfil = {
     return respuesta.data.datos
   },
 
+  async subirFotoPerfil(token: string, uriLocal: string, mime = 'image/jpeg'): Promise<PerfilUsuario> {
+    const form = new FormData()
+    const nombre = uriLocal.split('/').pop() ?? 'avatar.jpg'
+    form.append('foto', {
+      uri: uriLocal,
+      name: nombre,
+      type: mime,
+    } as unknown as Blob)
+    const respuesta = await clienteApi.post<RespuestaDatos<PerfilUsuario>>('/usuarios/perfil/foto', form, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'multipart/form-data',
+      },
+    })
+    return respuesta.data.datos
+  },
+
   async actualizarNombre(token: string, nombre: string): Promise<PerfilUsuario> {
     return servicioPerfil.actualizarPerfil(token, { nombre })
   },

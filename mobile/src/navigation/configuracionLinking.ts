@@ -1,18 +1,17 @@
-// Deep linking — preparado para activación futura
-// Para activar: pasar como prop `linking` al NavigationContainer en NavegadorRaiz
-//
-// Ejemplo de uso:
-//   <NavigationContainer theme={temaNexora} linking={configuracionLinking}>
+import * as Linking from 'expo-linking'
+
+const prefijo = Linking.createURL('/')
 
 export const configuracionLinking = {
-  prefixes: ['nexora://', 'https://nexora.app'],
+  prefixes: [prefijo, 'nexora://', 'https://nexora.app'],
   config: {
     screens: {
       Principal: {
         screens: {
           TabFeed: {
             screens: {
-              Detalle: 'publicacion/:publicacionId',
+              Feed: 'feed',
+              Detalle: 'noticia/:slug',
               PerfilPublico: 'usuario/:usuarioId',
             },
           },
@@ -21,6 +20,20 @@ export const configuracionLinking = {
               Notificaciones: 'notificaciones',
             },
           },
+          TabPerfil: {
+            screens: {
+              Perfil: 'perfil',
+              Detalle: 'perfil/publicacion/:publicacionId',
+              PerfilPublico: 'perfil/usuario/:usuarioId',
+              Moderacion: 'moderacion',
+            },
+          },
+        },
+      },
+      Auth: {
+        screens: {
+          Login: 'login',
+          Registro: 'registro',
         },
       },
     },

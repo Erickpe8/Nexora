@@ -1,6 +1,8 @@
 import React from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Alert, ScrollView } from 'react-native'
+import type { NativeStackScreenProps } from '@react-navigation/native-stack'
+import type { ParamsPerfil } from '../types/navegacion'
 import {
   Boton,
   CabeceraPerfil,
@@ -14,10 +16,13 @@ import {
 import { useAutenticacion } from '../hooks/useAutenticacion'
 import { usePerfil } from '../hooks/usePerfil'
 import { useHistorialComentarios } from '../hooks/useHistorialComentarios'
+import { irADetallePublicacion } from '../utils/navegacionHistorial'
 import { colores } from '../styles/colores'
 
-const PantallaPerfil = () => {
-  const { token, cerrarSesion } = useAutenticacion()
+type Props = NativeStackScreenProps<ParamsPerfil, 'Perfil'>
+
+const PantallaPerfil = ({ navigation }: Props) => {
+  const { token, actualizarUsuario, cerrarSesion } = useAutenticacion()
   const { perfil, cargando, guardando, error, cargar, actualizarPerfil } = usePerfil(token)
   const { historial, cargar: cargarHistorial } = useHistorialComentarios(token)
 
@@ -40,11 +45,17 @@ const PantallaPerfil = () => {
 
   const alGuardarPerfil = async (datos: Parameters<typeof actualizarPerfil>[0]) => {
     try {
-      await actualizarPerfil(datos)
+      const actualizado = await actualizarPerfil(datos)
+      await actualizarUsuario({ nombre: actualizado.nombre, username: actualizado.username })
       Alert.alert('Perfil actualizado', 'Tus cambios se guardaron correctamente.')
     } catch {
-      /* error ya en hook */
+      /* error en hook */
     }
+  }
+
+  const alFotoSubida = async (nuevo: { nombre: string }) => {
+    await actualizarUsuario({ nombre: nuevo.nombre })
+    void cargar()
   }
 
   return (
@@ -64,6 +75,7 @@ const PantallaPerfil = () => {
 
           <CabeceraPerfil
             nombre={perfil.nombre}
+            username={perfil.username}
             creadoEn={perfil.creadoEn}
             fotoPerfilUrl={perfil.fotoPerfilUrl}
             biografia={perfil.biografia}
@@ -78,6 +90,16 @@ const PantallaPerfil = () => {
 
           <EstadisticasPerfil totalComentarios={perfil.totalComentarios} />
 
+          <Boton className="mt-4" onPress={() => navigation.navigate('Guardados')}>
+            Mis guardados
+          </Boton>
+
+          {perfil.esModerador ? (
+            <Boton className="mt-4" onPress={() => navigation.navigate('Moderacion')}>
+              Panel de moderación
+            </Boton>
+          ) : null}
+
           {error ? (
             <Texto variante="caption" color={colores.error} className="mt-2">
               {error}
@@ -86,11 +108,16 @@ const PantallaPerfil = () => {
 
           <FormularioEditarPerfil
             perfil={perfil}
+            token={token}
             guardando={guardando}
             onGuardar={alGuardarPerfil}
+            onFotoSubida={alFotoSubida}
           />
 
-          <HistorialComentarios historial={historial} onPressItem={() => undefined} />
+          <HistorialComentarios
+            historial={historial}
+            onPressItem={publicacionId => irADetallePublicacion(navigation, publicacionId)}
+          />
 
           <Boton variante="secundario" className="mt-6" onPress={manejarCerrarSesion}>
             Cerrar sesión

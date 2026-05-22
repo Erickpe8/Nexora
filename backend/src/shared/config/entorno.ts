@@ -89,6 +89,20 @@ export const entorno = {
     umbralAutoDenuncias: Number(process.env.MODERACION_UMBRAL_DENUNCIAS) || 5,
     habilitarAutoOcultar: process.env.MODERACION_AUTO_OCULTAR === 'true',
   },
+
+  /** Cron externo (GitHub Actions, VPS, Railway, etc.) */
+  cron: {
+    secreto: process.env.CRON_SECRET || '',
+    origenesPermitidos: (process.env.CRON_ORIGENES_PERMITIDOS ||
+      'github-actions,manual,render,railway,vps,local')
+      .split(',')
+      .map(s => s.trim())
+      .filter(Boolean),
+  },
 } as const
+
+if (process.env.NODE_ENV === 'production' && process.env.VERCEL) {
+  requerirEnProd('CRON_SECRET', process.env.CRON_SECRET)
+}
 
 export type ConfigNexora = typeof entorno

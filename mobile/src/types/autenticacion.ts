@@ -1,6 +1,7 @@
 export interface Usuario {
   id: number
   nombre: string
+  username: string
   correo: string
   creadoEn?: string
 }

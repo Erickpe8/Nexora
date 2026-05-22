@@ -16,11 +16,15 @@ export type ParamsTabs = {
   TabPerfil:         undefined
 }
 
-export type ParamsFeed = {
-  Feed:          undefined
-  Detalle:       { publicacionId: number }
+/** Pantallas compartidas entre stacks Feed y Perfil */
+export type ParamsDetalleYPerfil = {
+  Detalle: { publicacionId?: number; slug?: string }
   PerfilPublico: { usuarioId: number }
 }
+
+export type ParamsFeed = {
+  Feed: undefined
+} & ParamsDetalleYPerfil
 
 export type ParamsNotificaciones = {
   Notificaciones: undefined
@@ -28,4 +32,6 @@ export type ParamsNotificaciones = {
 
 export type ParamsPerfil = {
   Perfil: undefined
-}
+  Guardados: undefined
+  Moderacion: undefined
+} & ParamsDetalleYPerfil

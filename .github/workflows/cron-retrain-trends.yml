@@ -1,0 +1,17 @@
+name: Cron — Reentrenar tendencias (semanal)
+
+on:
+  schedule:
+    - cron: '0 2 * * 0'
+  workflow_dispatch:
+
+jobs:
+  invoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/cron-invoke
+        with:
+          api-url: ${{ secrets.NEXORA_API_URL }}
+          cron-secret: ${{ secrets.CRON_SECRET }}
+          path: '/api/internal/cron/retrain-trends?modo=ejecutar'

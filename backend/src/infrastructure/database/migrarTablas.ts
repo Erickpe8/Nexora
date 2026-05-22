@@ -6,6 +6,8 @@
  * Uso: npm run migrar
  */
 import { pool, verificarConexion } from '../../shared/database/pool'
+import { generarSlugDesdeTitulo } from '../../utils/slug'
+import { generarUsernameDisponible } from '../../utils/username'
 
 interface MigracionSQL {
   descripcion: string
@@ -119,6 +121,65 @@ const migraciones: MigracionSQL[] = [
       INDEX idx_estado (estado)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`,
   },
+  {
+    descripcion: 'Crear tabla cola_trabajos (cron externo)',
+    sql: `CREATE TABLE IF NOT EXISTS cola_trabajos (
+      id             INT AUTO_INCREMENT PRIMARY KEY,
+      tipo           VARCHAR(64) NOT NULL,
+      payload        JSON DEFAULT NULL,
+      estado         ENUM('pendiente','procesando','completado','fallido') NOT NULL DEFAULT 'pendiente',
+      intentos       INT NOT NULL DEFAULT 0,
+      max_intentos   INT NOT NULL DEFAULT 3,
+      error_mensaje  TEXT DEFAULT NULL,
+      creado_en      DATETIME DEFAULT NOW(),
+      procesado_en   DATETIME DEFAULT NULL,
+      INDEX idx_cola_estado (estado, creado_en),
+      INDEX idx_cola_tipo (tipo)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`,
+  },
+  {
+    descripcion: 'Crear tabla publicaciones_guardadas',
+    sql: `CREATE TABLE IF NOT EXISTS publicaciones_guardadas (
+      id             INT AUTO_INCREMENT PRIMARY KEY,
+      usuario_id     INT NOT NULL,
+      publicacion_id INT NOT NULL,
+      leer_despues   BOOLEAN NOT NULL DEFAULT FALSE,
+      creado_en      DATETIME DEFAULT NOW(),
+      FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE,
+      FOREIGN KEY (publicacion_id) REFERENCES publicaciones(id) ON DELETE CASCADE,
+      UNIQUE KEY uq_guardado (usuario_id, publicacion_id),
+      INDEX idx_guardados_usuario (usuario_id, creado_en)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`,
+  },
+  {
+    descripcion: 'Crear tabla compartidos_eventos (analytics)',
+    sql: `CREATE TABLE IF NOT EXISTS compartidos_eventos (
+      id             INT AUTO_INCREMENT PRIMARY KEY,
+      tipo_objetivo  ENUM('publicacion','comentario') NOT NULL,
+      objetivo_id    INT NOT NULL,
+      usuario_id     INT DEFAULT NULL,
+      canal          VARCHAR(32) NOT NULL DEFAULT 'otro',
+      creado_en      DATETIME DEFAULT NOW(),
+      FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE SET NULL,
+      INDEX idx_compartidos_objetivo (tipo_objetivo, objetivo_id, creado_en),
+      INDEX idx_compartidos_usuario (usuario_id, creado_en)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`,
+  },
+  {
+    descripcion: 'Crear tabla cron_ejecuciones (historial cron)',
+    sql: `CREATE TABLE IF NOT EXISTS cron_ejecuciones (
+      id           INT AUTO_INCREMENT PRIMARY KEY,
+      tipo         VARCHAR(64) NOT NULL,
+      origen       VARCHAR(64) NOT NULL DEFAULT 'desconocido',
+      exito        BOOLEAN NOT NULL DEFAULT FALSE,
+      duracion_ms  INT NOT NULL DEFAULT 0,
+      mensaje      VARCHAR(500) DEFAULT NULL,
+      detalle      JSON DEFAULT NULL,
+      creado_en    DATETIME DEFAULT NOW(),
+      INDEX idx_cron_tipo (tipo, creado_en),
+      INDEX idx_cron_exito (exito, creado_en)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`,
+  },
 ]
 
 const migrarTablas = async (): Promise<void> => {
@@ -140,6 +201,13 @@ const migrarTablas = async (): Promise<void> => {
   console.log('\n🔧 Agregando columnas nuevas a tablas existentes...\n')
 
   await agregarColumnasSiNoExisten('publicaciones', [
+    { nombre: 'compartidos_count',    definicion: 'compartidos_count INT NOT NULL DEFAULT 0 AFTER relevancia' },
+    { nombre: 'slug',                 definicion: 'slug VARCHAR(120) DEFAULT NULL AFTER id' },
+    { nombre: 'categoria',            definicion: 'categoria VARCHAR(50) DEFAULT NULL AFTER pregunta' },
+    { nombre: 'contenido_expandido',  definicion: 'contenido_expandido TEXT DEFAULT NULL AFTER resumen' },
+    { nombre: 'fuente_url',           definicion: 'fuente_url VARCHAR(500) DEFAULT NULL AFTER etiquetas' },
+    { nombre: 'imagen_url',           definicion: 'imagen_url VARCHAR(500) DEFAULT NULL AFTER fuente_url' },
+    { nombre: 'relevancia',           definicion: 'relevancia INT DEFAULT 0 AFTER imagen_url' },
     { nombre: 'proveedor_ia',         definicion: "proveedor_ia VARCHAR(50) DEFAULT 'deepseek' AFTER generado_por_ia" },
     { nombre: 'version_prompt',       definicion: 'version_prompt VARCHAR(20) DEFAULT NULL AFTER proveedor_ia' },
     { nombre: 'hash_contenido',       definicion: 'hash_contenido VARCHAR(64) DEFAULT NULL AFTER version_prompt' },
@@ -147,6 +215,7 @@ const migrarTablas = async (): Promise<void> => {
   ])
 
   await agregarColumnasSiNoExisten('usuarios', [
+    { nombre: 'username', definicion: 'username VARCHAR(30) DEFAULT NULL AFTER nombre' },
     { nombre: 'biografia', definicion: 'biografia VARCHAR(500) DEFAULT NULL AFTER contrasena' },
     { nombre: 'foto_perfil_url', definicion: 'foto_perfil_url VARCHAR(500) DEFAULT NULL AFTER biografia' },
     { nombre: 'fecha_nacimiento', definicion: 'fecha_nacimiento DATE DEFAULT NULL AFTER foto_perfil_url' },
@@ -176,7 +245,45 @@ const migrarTablas = async (): Promise<void> => {
     console.log('  ⏭  Índice idx_estado_moderacion ya existe — omitido')
   }
 
-  // 5. Semilla: versión inicial del prompt si no existe
+  // 5. Rellenar username y slug en filas existentes
+  console.log('\n🔧 Rellenando username y slug en datos existentes...\n')
+  try {
+    const [sinUsername] = await pool.query<any[]>(
+      'SELECT id, nombre FROM usuarios WHERE username IS NULL OR username = \'\''
+    )
+    for (const fila of sinUsername) {
+      const username = await generarUsernameDisponible(String(fila.nombre || 'usuario'))
+      await pool.execute('UPDATE usuarios SET username = ? WHERE id = ?', [username, fila.id])
+    }
+    console.log(`  ✅ Usernames asignados: ${sinUsername.length}`)
+
+    const [sinSlug] = await pool.query<any[]>(
+      'SELECT id, titulo FROM publicaciones WHERE slug IS NULL OR slug = \'\''
+    )
+    for (const pub of sinSlug) {
+      const slug = generarSlugDesdeTitulo(String(pub.titulo), Number(pub.id))
+      await pool.execute('UPDATE publicaciones SET slug = ? WHERE id = ?', [slug, pub.id])
+    }
+    console.log(`  ✅ Slugs asignados: ${sinSlug.length}`)
+  } catch (e) {
+    console.warn('  ⚠️  Relleno username/slug:', (e as Error).message)
+  }
+
+  try {
+    await pool.execute('ALTER TABLE usuarios ADD UNIQUE INDEX uq_username (username)')
+    console.log('  ✅ Índice único uq_username')
+  } catch {
+    console.log('  ⏭  Índice uq_username ya existe — omitido')
+  }
+
+  try {
+    await pool.execute('ALTER TABLE publicaciones ADD UNIQUE INDEX uq_slug (slug)')
+    console.log('  ✅ Índice único uq_slug')
+  } catch {
+    console.log('  ⏭  Índice uq_slug ya existe — omitido')
+  }
+
+  // 6. Semilla: versión inicial del prompt si no existe
   try {
     await pool.execute(
       `INSERT IGNORE INTO versiones_prompt_ia (nombre, version, plantilla, activo) VALUES (?, ?, ?, ?)`,

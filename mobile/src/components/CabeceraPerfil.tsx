@@ -6,6 +6,7 @@ import { colores } from '../styles/colores'
 
 interface PropsCabeceraPerfil {
   nombre: string
+  username?: string
   creadoEn: string
   fotoPerfilUrl?: string | null
   biografia?: string | null
@@ -21,6 +22,7 @@ const formatearFecha = (iso: string): string =>
 
 const CabeceraPerfil = ({
   nombre,
+  username,
   creadoEn,
   fotoPerfilUrl,
   biografia,
@@ -32,6 +34,11 @@ const CabeceraPerfil = ({
       <Texto variante="subtitulo" className="mt-3 text-center">
         {nombre}
       </Texto>
+      {username ? (
+        <Texto variante="caption" color={colores.acento} className="mt-1">
+          @{username}
+        </Texto>
+      ) : null}
       <Texto variante="caption" className="mt-1">
         Miembro desde {formatearFecha(creadoEn)}
       </Texto>

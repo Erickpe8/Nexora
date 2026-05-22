@@ -3,6 +3,7 @@ export interface Comentario {
   publicacionId: number
   usuarioId: number
   nombreUsuario: string
+  username: string
   comentarioPadreId: number | null
   contenido: string
   eliminado: boolean

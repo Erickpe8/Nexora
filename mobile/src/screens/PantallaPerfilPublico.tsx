@@ -2,7 +2,7 @@ import React from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { ScrollView } from 'react-native'
 import type { NativeStackScreenProps } from '@react-navigation/native-stack'
-import type { ParamsFeed } from '../types/navegacion'
+import type { ParamsDetalleYPerfil } from '../types/navegacion'
 import {
   CabeceraPerfil,
   Cargador,
@@ -15,10 +15,11 @@ import type { PerfilPublico } from '../types'
 import { useAutenticacion } from '../hooks/useAutenticacion'
 import { servicioPerfil } from '../services/servicioPerfil'
 import { useHistorialComentarios } from '../hooks/useHistorialComentarios'
+import { irADetallePublicacion } from '../utils/navegacionHistorial'
 
-type Props = NativeStackScreenProps<ParamsFeed, 'PerfilPublico'>
+type Props = NativeStackScreenProps<ParamsDetalleYPerfil, 'PerfilPublico'>
 
-const PantallaPerfilPublico = ({ route }: Props) => {
+const PantallaPerfilPublico = ({ route, navigation }: Props) => {
   const { token } = useAutenticacion()
   const [perfil, setPerfil] = React.useState<PerfilPublico | null>(null)
   const [cargando, setCargando] = React.useState(false)
@@ -55,6 +56,7 @@ const PantallaPerfilPublico = ({ route }: Props) => {
 
           <CabeceraPerfil
             nombre={perfil.nombre}
+            username={perfil.username}
             creadoEn={perfil.creadoEn}
             fotoPerfilUrl={perfil.fotoPerfilUrl}
             biografia={perfil.biografia}
@@ -65,7 +67,10 @@ const PantallaPerfilPublico = ({ route }: Props) => {
 
           <EstadisticasPerfil totalComentarios={perfil.totalComentarios} />
 
-          <HistorialComentarios historial={historial} onPressItem={() => undefined} />
+          <HistorialComentarios
+            historial={historial}
+            onPressItem={publicacionId => irADetallePublicacion(navigation, publicacionId)}
+          />
         </ScrollView>
       )}
     </SafeAreaView>

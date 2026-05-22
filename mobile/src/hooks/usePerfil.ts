@@ -22,12 +22,14 @@ export const usePerfil = (token: string | null) => {
   }, [token])
 
   const actualizarPerfil = useCallback(
-    async (datos: ActualizarPerfil) => {
-      if (!token) return
+    async (datos: ActualizarPerfil): Promise<PerfilUsuario> => {
+      if (!token) throw new Error('sin_sesion')
       setGuardando(true)
       setError(null)
       try {
-        setPerfil(await servicioPerfil.actualizarPerfil(token, datos))
+        const actualizado = await servicioPerfil.actualizarPerfil(token, datos)
+        setPerfil(actualizado)
+        return actualizado
       } catch {
         setError('No se pudo guardar el perfil. Revisa los datos e intenta de nuevo.')
         throw new Error('error_actualizar_perfil')
@@ -39,7 +41,9 @@ export const usePerfil = (token: string | null) => {
   )
 
   const actualizarNombre = useCallback(
-    async (nombre: string) => actualizarPerfil({ nombre }),
+    async (nombre: string) => {
+      await actualizarPerfil({ nombre })
+    },
     [actualizarPerfil]
   )
 

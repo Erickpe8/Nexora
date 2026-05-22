@@ -1,4 +1,5 @@
 import express, { type Express } from 'express'
+import path from 'path'
 import helmet from 'helmet'
 import cors from 'cors'
 import { limitadorGeneral } from './middlewares/rateLimiting'
@@ -6,6 +7,7 @@ import { middlewareErrores, middlewareNoEncontrado } from './middlewares/errores
 import { middlewareCorrelacion } from './middlewares/correlacion'
 import { middlewareSemillaDespliegue } from './middlewares/semillaDespliegue'
 import rutasCron from './routes/cron.rutas'
+import rutasCronInterno from './routes/internalCron.rutas'
 import rutasAuth from './routes/auth.rutas'
 import rutasPublicaciones from './routes/publicaciones.rutas'
 import rutasComentarios from './routes/comentarios.rutas'
@@ -29,6 +31,9 @@ export const crearAplicacion = (): Express => {
   app.use(middlewareCorrelacion)
   app.use(middlewareSemillaDespliegue)
   app.use('/api/salud', rutasSalud)
+  /** Cron externo (GitHub Actions, VPS, etc.) — sin limitador general */
+  app.use('/api/internal/cron', rutasCronInterno)
+  /** Legacy: redirige mentalmente a /api/internal/cron/generate-news */
   app.use('/api/cron', rutasCron)
   app.use(limitadorGeneral)
 
@@ -43,6 +48,10 @@ export const crearAplicacion = (): Express => {
   app.use('/api/notificaciones', rutasNotificaciones)
   app.use('/api/moderacion', rutasModeracion)
   app.use('/api/interno', rutasInterno)
+
+  if (!process.env.VERCEL) {
+    app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')))
+  }
 
   app.use(middlewareNoEncontrado)
   app.use(middlewareErrores)

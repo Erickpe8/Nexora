@@ -13,6 +13,7 @@ interface DenunciaFila extends RowDataPacket {
   detalle: string | null
   estado: string
   creado_en: string
+  publicacion_id?: number | null
 }
 
 const mapearDenuncia = (fila: DenunciaFila): Denuncia => ({
@@ -24,6 +25,7 @@ const mapearDenuncia = (fila: DenunciaFila): Denuncia => ({
   detalle: fila.detalle,
   estado: fila.estado as Denuncia['estado'],
   creadoEn: fila.creado_en,
+  publicacionId: fila.publicacion_id != null ? Number(fila.publicacion_id) : undefined,
 })
 
 /** Ventana de deduplicación: un usuario no puede denunciar el mismo objetivo dos veces en 24h. */
@@ -120,17 +122,21 @@ export const obtenerDenunciasPaginadas = async (
   const limiteNorm = Math.min(50, Math.max(1, limite))
   const offset = (paginaNorm - 1) * limiteNorm
 
-  const condicion = estado ? 'WHERE estado = ?' : ''
-  const params = estado ? [estado, limiteNorm, offset] : [limiteNorm, offset]
+  const whereDenuncia = estado ? 'WHERE d.estado = ?' : ''
 
   const [conteo] = await pool.execute<RowDataPacket[]>(
-    `SELECT COUNT(*) AS total FROM denuncias ${condicion}`,
+    `SELECT COUNT(*) AS total FROM denuncias d ${whereDenuncia}`,
     estado ? [estado] : []
   )
   const total = Number(conteo[0]?.total ?? 0)
 
   const [filas] = await pool.query<DenunciaFila[]>(
-    `SELECT * FROM denuncias ${condicion} ORDER BY creado_en DESC LIMIT ${limiteNorm} OFFSET ${offset}`,
+    `SELECT d.*, c.publicacion_id
+     FROM denuncias d
+     LEFT JOIN comentarios c ON d.tipo_objetivo = 'comentario' AND d.objetivo_id = c.id
+     ${whereDenuncia}
+     ORDER BY d.creado_en DESC
+     LIMIT ${limiteNorm} OFFSET ${offset}`,
     estado ? [estado] : []
   )
 

@@ -5,6 +5,8 @@ import Boton from './Boton'
 import Tarjeta from './Tarjeta'
 import Texto from './Texto'
 import ModalDenuncia from './ModalDenuncia'
+import ModalCompartir from './ModalCompartir'
+import { servicioEngagement, type CanalCompartir } from '../services/servicioEngagement'
 import { useDenuncias } from '../hooks/useDenuncias'
 import { useLikeComentario } from '../hooks/useLikeComentario'
 import { useContextoAuth } from '../context/ContextoAutenticacion'
@@ -12,10 +14,14 @@ import type { MotivosDenuncia } from '../types/moderacion'
 import { colores } from '../styles/colores'
 import { espaciado } from '../styles/espaciado'
 import Icono from './Icono'
+import NametagUsuario from './NametagUsuario'
+import { tiempoRelativo } from '../utils/tiempoRelativo'
 
 interface PropsTarjetaComentario {
   comentario: Comentario
   usuarioActual: Usuario | null
+  slugPublicacion?: string
+  tituloPublicacion?: string
   onResponder: (comentarioId: number) => void
   onEliminar: (comentarioId: number) => void
   onPerfil: (usuarioId: number) => void
@@ -27,10 +33,14 @@ const TarjetaComentario = ({
   onResponder,
   onEliminar,
   onPerfil,
+  slugPublicacion,
+  tituloPublicacion,
 }: PropsTarjetaComentario) => {
   const { token } = useContextoAuth()
   const esAutor = usuarioActual?.id === comentario.usuarioId
   const [modalVisible, setModalVisible] = useState(false)
+  const [modalCompartir, setModalCompartir] = useState(false)
+  const [enviandoShare, setEnviandoShare] = useState(false)
   const { enviando: enviandoDenuncia, enviada, error, denunciar, reiniciar } = useDenuncias(token)
   const { totalLikes, meDioLike, enviando: enviandoLike, alternar: alternarLike } =
     useLikeComentario(token, comentario.id, comentario.totalLikes, comentario.meDioLike)
@@ -58,18 +68,18 @@ const TarjetaComentario = ({
   return (
     <>
       <Tarjeta className="mb-2">
-        <Texto
-          variante="etiqueta"
-          className="mb-1"
-          onPress={() => onPerfil(comentario.usuarioId)}
-        >
-          {comentario.nombreUsuario}
-        </Texto>
+        <View className="mb-1">
+          <NametagUsuario
+            username={comentario.username}
+            nombreVisible={comentario.nombreUsuario}
+            onPress={() => onPerfil(comentario.usuarioId)}
+          />
+        </View>
 
         <Texto variante="cuerpo">{comentario.contenido}</Texto>
 
         <Texto variante="etiqueta" className="mt-2">
-          {new Date(comentario.creadoEn).toLocaleString()}
+          {tiempoRelativo(comentario.creadoEn)}
         </Texto>
 
         <View className="mt-2 flex-row gap-2 flex-wrap items-center">
@@ -129,8 +139,34 @@ const TarjetaComentario = ({
               Denunciar
             </Boton>
           ) : null}
+
+          {!comentario.eliminado && slugPublicacion ? (
+            <Boton variante="fantasma" tamano="sm" onPress={() => setModalCompartir(true)}>
+              <Icono nombre="compartir" tamano={18} />
+            </Boton>
+          ) : null}
         </View>
       </Tarjeta>
+
+      {slugPublicacion ? (
+        <ModalCompartir
+          visible={modalCompartir}
+          titulo={tituloPublicacion ?? 'Comentario en Nexora'}
+          slug={slugPublicacion}
+          comentarioId={comentario.id}
+          enviando={enviandoShare}
+          onCompartir={async (canal: CanalCompartir) => {
+            if (!token) return { url: '' }
+            setEnviandoShare(true)
+            try {
+              return await servicioEngagement.compartirComentario(token, comentario.id, canal)
+            } finally {
+              setEnviandoShare(false)
+            }
+          }}
+          onCerrar={() => setModalCompartir(false)}
+        />
+      ) : null}
 
       <ModalDenuncia
         visible={modalVisible}

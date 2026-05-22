@@ -378,3 +378,44 @@ Al terminar cada fase, marcar el estado como `[x] Completado` en este archivo.
 - `TarjetaComentario` actualizada con botón "Denunciar" y placeholder para comentarios ocultos
 - `useComentariosEnTiempoReal` escucha `comentario_oculto` y `comentario_restaurado`
 - `useComentarios` con `ocultarDesdeTiempoReal` y `restaurarDesdeTiempoReal`
+
+---
+
+## Roadmap social (post-Fase 12) — Orden estratégico
+
+**Regla:** no iniciar followers hasta que la red “se sienta viva” y la Fase 1 social esté en producción.
+
+### Checklist fundacional (antes de followers)
+
+| Capacidad | Estado |
+|-----------|--------|
+| Comentarios anidados (1 nivel) + likes | ✅ |
+| Notificaciones in-app | ✅ |
+| Perfiles + `@username` | ✅ |
+| Reacciones en publicaciones | ✅ |
+| Moderación + denuncias | ✅ |
+| Realtime Socket.IO | ✅ local · ⚠️ Vercel usa polling |
+| Cron IA externo | ✅ GitHub Actions + cola |
+
+### Fase 13 — Guardados + Compartir
+**Spec:** `.kiro/specs/guardados-compartir/`  
+**Rama:** `feature/13-guardados-compartir`  
+**Estado:** `[x] Completado` (API + mobile v1; OG preview cards pendiente web)
+
+Retención, viralidad, señales para recomendaciones. Ver `tasks.md` del spec.
+
+### Fase 14 — Menciones + Hashtags
+**Spec:** `.kiro/specs/menciones-hashtags/`  
+**Rama:** `feature/14-menciones-hashtags`  
+**Estado:** `[ ] Pendiente`  
+**Dependencia:** Fase 13
+
+Conversaciones conectadas y descubrimiento tipo X.
+
+### Fase 15 — Sistema social (followers / temas)
+**Spec:** `.kiro/specs/sistema-social/`  
+**Rama:** `feature/15-sistema-social`  
+**Estado:** `[ ] Pendiente`  
+**Dependencia:** Fases 13 y 14
+
+Feed personalizado, seguir usuarios/temas, sugerencias.

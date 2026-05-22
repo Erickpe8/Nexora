@@ -1,0 +1,24 @@
+# Encola generación de noticias IA (la cola las procesa cada 5 min).
+name: Cron — Generar noticias IA
+
+on:
+  schedule:
+    - cron: '15 */2 * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: cron-generate-news
+  cancel-in-progress: false
+
+jobs:
+  invoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/cron-invoke
+        with:
+          api-url: ${{ secrets.NEXORA_API_URL }}
+          cron-secret: ${{ secrets.CRON_SECRET }}
+          path: '/api/internal/cron/generate-news?modo=encolar'
+          timeout-seconds: '60'

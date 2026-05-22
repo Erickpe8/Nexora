@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react'
-import { View } from 'react-native'
+import { Alert, View } from 'react-native'
+import * as ImagePicker from 'expo-image-picker'
 import type { PerfilUsuario, RedesSociales } from '../types/perfil'
+import { servicioPerfil } from '../services/servicioPerfil'
 import Boton from './Boton'
 import Entrada from './Entrada'
 import Texto from './Texto'
@@ -8,14 +10,17 @@ import { colores } from '../styles/colores'
 
 interface PropsFormularioEditarPerfil {
   perfil: PerfilUsuario
+  token: string | null
   guardando: boolean
   onGuardar: (datos: {
     nombre: string
+    username: string
     biografia: string | null
     fotoPerfilUrl: string | null
     fechaNacimiento: string | null
     redesSociales: RedesSociales
   }) => Promise<void>
+  onFotoSubida?: (perfil: PerfilUsuario) => void
 }
 
 const estadoInicialRedes = (perfil: PerfilUsuario): RedesSociales => ({
@@ -29,15 +34,24 @@ const estadoInicialRedes = (perfil: PerfilUsuario): RedesSociales => ({
   web: perfil.redesSociales.web ?? '',
 })
 
-const FormularioEditarPerfil = ({ perfil, guardando, onGuardar }: PropsFormularioEditarPerfil) => {
+const FormularioEditarPerfil = ({
+  perfil,
+  token,
+  guardando,
+  onGuardar,
+  onFotoSubida,
+}: PropsFormularioEditarPerfil) => {
   const [nombre, setNombre] = useState(perfil.nombre)
+  const [username, setUsername] = useState(perfil.username)
   const [biografia, setBiografia] = useState(perfil.biografia ?? '')
   const [fotoPerfilUrl, setFotoPerfilUrl] = useState(perfil.fotoPerfilUrl ?? '')
   const [fechaNacimiento, setFechaNacimiento] = useState(perfil.fechaNacimiento ?? '')
   const [redes, setRedes] = useState<RedesSociales>(() => estadoInicialRedes(perfil))
+  const [subiendoFoto, setSubiendoFoto] = useState(false)
 
   useEffect(() => {
     setNombre(perfil.nombre)
+    setUsername(perfil.username)
     setBiografia(perfil.biografia ?? '')
     setFotoPerfilUrl(perfil.fotoPerfilUrl ?? '')
     setFechaNacimiento(perfil.fechaNacimiento ?? '')
@@ -46,6 +60,39 @@ const FormularioEditarPerfil = ({ perfil, guardando, onGuardar }: PropsFormulari
 
   const actualizarRed = (clave: keyof RedesSociales, valor: string) => {
     setRedes(prev => ({ ...prev, [clave]: valor }))
+  }
+
+  const elegirFoto = async () => {
+    if (!token) return
+    const permiso = await ImagePicker.requestMediaLibraryPermissionsAsync()
+    if (!permiso.granted) {
+      Alert.alert('Permiso necesario', 'Permite acceso a la galería para elegir una foto.')
+      return
+    }
+    const resultado = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images'],
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.85,
+    })
+    if (resultado.canceled || !resultado.assets[0]) return
+
+    const asset = resultado.assets[0]
+    setSubiendoFoto(true)
+    try {
+      const actualizado = await servicioPerfil.subirFotoPerfil(
+        token,
+        asset.uri,
+        asset.mimeType ?? 'image/jpeg'
+      )
+      setFotoPerfilUrl(actualizado.fotoPerfilUrl ?? '')
+      onFotoSubida?.(actualizado)
+      Alert.alert('Foto actualizada', 'Tu foto de perfil se guardó correctamente.')
+    } catch {
+      Alert.alert('Error', 'No se pudo subir la imagen. También puedes pegar una URL.')
+    } finally {
+      setSubiendoFoto(false)
+    }
   }
 
   const alGuardar = () => {
@@ -69,10 +116,21 @@ const FormularioEditarPerfil = ({ perfil, guardando, onGuardar }: PropsFormulari
         Editar perfil
       </Texto>
 
-      <Entrada etiqueta="Nombre de usuario" value={nombre} onChangeText={setNombre} />
+      <Boton variante="secundario" cargando={subiendoFoto} onPress={() => void elegirFoto()} className="mb-3">
+        Elegir foto desde galería
+      </Boton>
+
+      <Entrada etiqueta="Nombre visible" value={nombre} onChangeText={setNombre} />
+      <Entrada
+        etiqueta="Username (@)"
+        placeholder="usuario_unico"
+        value={username}
+        onChangeText={setUsername}
+        autoCapitalize="none"
+      />
 
       <Entrada
-        etiqueta="URL de foto de perfil"
+        etiqueta="URL de foto de perfil (alternativa)"
         placeholder="https://ejemplo.com/foto.jpg"
         value={fotoPerfilUrl}
         onChangeText={setFotoPerfilUrl}
