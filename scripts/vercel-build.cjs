@@ -54,22 +54,29 @@ try {
 }
 
 const distDir = path.join(mobileDir, 'dist')
+const faviconPng = path.join(mobileDir, 'assets', 'favicon.png')
 const faviconSvg = path.join(mobileDir, 'assets', 'favicon.svg')
-const faviconDest = path.join(distDir, 'favicon.svg')
 const indexHtml = path.join(distDir, 'index.html')
 
+if (fs.existsSync(faviconPng)) {
+  fs.copyFileSync(faviconPng, path.join(distDir, 'favicon.png'))
+}
+
 if (fs.existsSync(faviconSvg)) {
-  fs.copyFileSync(faviconSvg, faviconDest)
-  if (fs.existsSync(indexHtml)) {
-    let html = fs.readFileSync(indexHtml, 'utf8')
-    const enlaceSvg =
-      '<link rel="icon" href="/favicon.svg" type="image/svg+xml" />'
-    if (!html.includes('favicon.svg')) {
-      html = html.replace('</head>', `  ${enlaceSvg}\n</head>`)
-      fs.writeFileSync(indexHtml, html)
-    }
+  fs.copyFileSync(faviconSvg, path.join(distDir, 'favicon.svg'))
+}
+
+if (fs.existsSync(indexHtml)) {
+  let html = fs.readFileSync(indexHtml, 'utf8')
+  const enlaces = []
+  if (fs.existsSync(path.join(distDir, 'favicon.svg')) && !html.includes('favicon.svg')) {
+    enlaces.push('<link rel="icon" href="/favicon.svg" type="image/svg+xml" />')
   }
-  console.log('\n🎨 Favicon SVG copiado a mobile/dist/favicon.svg')
+  if (enlaces.length) {
+    html = html.replace('</head>', `  ${enlaces.join('\n  ')}\n</head>`)
+    fs.writeFileSync(indexHtml, html)
+  }
+  console.log('\n🎨 Favicon listo en mobile/dist (PNG para Expo + SVG opcional en HTML)')
 }
 
 console.log('\n✅ Build listo: backend/dist + mobile/dist')
