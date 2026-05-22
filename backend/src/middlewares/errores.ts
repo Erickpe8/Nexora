@@ -68,11 +68,14 @@ export const middlewareErrores = (
   }
 
   const msg = error.message ?? ''
+  const codigoMysql =
+    typeof error === 'object' && error !== null && 'code' in error
+      ? String((error as { code: unknown }).code)
+      : ''
   const esEsquemaDesactualizado =
     msg.includes('Unknown column') ||
     msg.includes("doesn't exist") ||
-    (typeof (error as { code?: string }).code === 'string' &&
-      (error as { code: string }).code === 'ER_BAD_FIELD_ERROR')
+    codigoMysql === 'ER_BAD_FIELD_ERROR'
 
   if (esEsquemaDesactualizado) {
     registro.error('HTTP', error, { ruta: req.path, metodo: req.method, status: 503 })
