@@ -34,10 +34,10 @@ try {
 
 const env = { ...process.env }
 const urlProdPorDefecto = 'https://nexora-ruddy-nine.vercel.app/api'
-if (!env.EXPO_PUBLIC_API_URL) {
-  env.EXPO_PUBLIC_API_URL = env.VERCEL_URL
-    ? `https://${env.VERCEL_URL}/api`
-    : urlProdPorDefecto
+if (env.VERCEL && env.VERCEL_URL) {
+  env.EXPO_PUBLIC_API_URL = `https://${env.VERCEL_URL}/api`
+} else if (!env.EXPO_PUBLIC_API_URL) {
+  env.EXPO_PUBLIC_API_URL = urlProdPorDefecto
 }
 
 try {

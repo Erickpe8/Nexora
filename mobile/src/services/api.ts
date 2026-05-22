@@ -17,6 +17,15 @@ const hostnameApiEsRedPrivada = (hostname: string): boolean =>
  */
 function resolverUrlBaseApi(): string {
   const raw = (process.env.EXPO_PUBLIC_API_URL || 'http://localhost:4010/api').trim()
+
+  /**
+   * Web en Vercel: frontend y API comparten el mismo host (rewrite /api → función).
+   * Usar ruta relativa evita CORS entre preview y producción.
+   */
+  if (typeof window !== 'undefined' && window.location?.hostname?.includes('vercel.app')) {
+    return '/api'
+  }
+
   if (typeof window === 'undefined' || !window.location?.hostname) return raw
   const origen = window.location.hostname
   if (origen !== 'localhost' && origen !== '127.0.0.1') return raw

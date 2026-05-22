@@ -53,22 +53,28 @@ export const opcionesCors: CorsOptions = {
 export const middlewareCors = cors(opcionesCors)
 
 /** Refuerzo para serverless Vercel: preflight OPTIONS explícito. */
+export const aplicarCabecerasCors = (
+  origin: string | undefined,
+  res: import('express').Response
+): boolean => {
+  if (!origin || !esOrigenPermitido(origin)) return false
+  res.setHeader('Access-Control-Allow-Origin', origin)
+  res.setHeader('Access-Control-Allow-Credentials', 'true')
+  res.setHeader('Vary', 'Origin')
+  res.setHeader(
+    'Access-Control-Allow-Headers',
+    'Origin, X-Requested-With, Content-Type, Accept, Authorization, X-Cron-Origen, X-Interno-Api-Key'
+  )
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS')
+  return true
+}
+
 export const middlewarePreflightVercel = (
   req: import('express').Request,
   res: import('express').Response,
   next: import('express').NextFunction
 ): void => {
-  const origin = req.headers.origin
-  if (origin && esOrigenPermitido(origin)) {
-    res.setHeader('Access-Control-Allow-Origin', origin)
-    res.setHeader('Access-Control-Allow-Credentials', 'true')
-    res.setHeader('Vary', 'Origin')
-    res.setHeader(
-      'Access-Control-Allow-Headers',
-      'Origin, X-Requested-With, Content-Type, Accept, Authorization, X-Cron-Origen, X-Interno-Api-Key'
-    )
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS')
-  }
+  aplicarCabecerasCors(req.headers.origin, res)
 
   if (req.method === 'OPTIONS') {
     res.sendStatus(204)

@@ -24,9 +24,9 @@ import rutasInterno from './routes/interno.rutas'
 export const crearAplicacion = (): Express => {
   const app = express()
 
-  app.use(middlewareCors)
-  app.options('*', middlewareCors)
+  /** Preflight primero: responde OPTIONS antes de helmet/rutas (crítico en Vercel). */
   app.use(middlewarePreflightVercel)
+  app.use(middlewareCors)
   app.use(
     helmet({
       crossOriginResourcePolicy: { policy: 'cross-origin' },

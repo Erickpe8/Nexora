@@ -19,10 +19,13 @@ const esPlaceholder = (valor: string): boolean =>
  * Valida que una variable de entorno exista y no sea placeholder en producción.
  * En desarrollo solo advierte; en producción lanza error y detiene el proceso.
  */
+/** En Vercel serverless, nunca hacer process.exit al importar el módulo (tumba toda la función). */
+const esServerlessVercel = Boolean(process.env.VERCEL)
+
 const requerirEnProd = (nombre: string, valor: string | undefined): string => {
   if (!valor || valor.trim() === '') {
     const msg = `[Config] Variable de entorno requerida no definida: ${nombre}`
-    if (process.env.NODE_ENV === 'production') {
+    if (process.env.NODE_ENV === 'production' && !esServerlessVercel) {
       console.error(msg)
       process.exit(1)
     }
@@ -31,8 +34,11 @@ const requerirEnProd = (nombre: string, valor: string | undefined): string => {
   }
   if (process.env.NODE_ENV === 'production' && esPlaceholder(valor)) {
     const msg = `[Config] Variable ${nombre} contiene un placeholder prohibido en producción`
-    console.error(msg)
-    process.exit(1)
+    if (!esServerlessVercel) {
+      console.error(msg)
+      process.exit(1)
+    }
+    console.warn(msg)
   }
   return valor
 }
@@ -100,9 +106,5 @@ export const entorno = {
       .filter(Boolean),
   },
 } as const
-
-if (process.env.NODE_ENV === 'production' && process.env.VERCEL) {
-  requerirEnProd('CRON_SECRET', process.env.CRON_SECRET)
-}
 
 export type ConfigNexora = typeof entorno
