@@ -6,6 +6,20 @@ import { limitadorAuth } from '../middlewares/rateLimiting'
 
 const rutasAuth = Router()
 
+rutasAuth.get('/registro', (_req, res) => {
+  res.status(405).json({
+    error: 'Usa POST con JSON: { nombre, correo, contrasena }',
+    codigo: 405,
+  })
+})
+
+rutasAuth.get('/login', (_req, res) => {
+  res.status(405).json({
+    error: 'Usa POST con JSON: { correo, contrasena }',
+    codigo: 405,
+  })
+})
+
 rutasAuth.post(
   '/registro',
   limitadorAuth,

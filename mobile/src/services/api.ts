@@ -11,26 +11,39 @@ const hostnameApiEsRedPrivada = (hostname: string): boolean =>
   /^10\./.test(hostname) ||
   /^172\.(1[6-9]|2\d|3[01])\./.test(hostname)
 
+/** Asegura protocolo http(s); evita "Unsupported protocol" de Axios si falta en .env. */
+const normalizarUrlApi = (raw: string): string => {
+  const t = raw.trim()
+  if (!t) return 'http://localhost:4010/api'
+  if (/^https?:\/\//i.test(t)) return t.replace(/\/$/, '')
+  if (t.startsWith('/')) {
+    if (typeof window !== 'undefined' && window.location?.origin) {
+      return `${window.location.origin}${t}`.replace(/\/$/, '')
+    }
+    return t.replace(/\/$/, '')
+  }
+  return `https://${t.replace(/\/$/, '')}`
+}
+
 /**
  * En el navegador con origen localhost, pedir a la IP LAN de la misma máquina suele dar ERR_CONNECTION_TIMED_OUT.
  * Usamos localhost en el API manteniendo puerto y ruta; en nativo no hay window → se deja el .env tal cual (Expo Go).
  */
 function resolverUrlBaseApi(): string {
-  const raw = (process.env.EXPO_PUBLIC_API_URL || 'http://localhost:4010/api').trim()
+  const raw = normalizarUrlApi(process.env.EXPO_PUBLIC_API_URL || 'http://localhost:4010/api')
 
   /**
-   * Web en Vercel: frontend y API comparten el mismo host (rewrite /api → función).
-   * Usar ruta relativa evita CORS entre preview y producción.
+   * Web en Vercel: mismo host (rewrite /api). Axios exige URL absoluta (https://…/api), no "/api" solo.
    */
   if (typeof window !== 'undefined' && window.location?.hostname?.includes('vercel.app')) {
-    return '/api'
+    return `${window.location.origin}/api`
   }
 
   if (typeof window === 'undefined' || !window.location?.hostname) return raw
   const origen = window.location.hostname
   if (origen !== 'localhost' && origen !== '127.0.0.1') return raw
   try {
-    const u = new URL(raw)
+    const u = new URL(normalizarUrlApi(raw))
     if (!hostnameApiEsRedPrivada(u.hostname)) return raw
     const hostAnterior = u.hostname
     u.hostname = 'localhost'
