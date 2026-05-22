@@ -100,6 +100,19 @@ Línea horizontal con el color de borde del tema
 ### `Insignia`
 Props: `texto`, `variante` (acento | exito | error | info)
 
+### `Icono`
+Componente central de iconografía (`mobile/src/components/Icono.tsx`).
+
+- Fuente: **Ionicons outline** (`@expo/vector-icons`), estilo similar a Flowbite/Heroicons.
+- API: `nombre` (`NombreIcono`), `tamano`, `color`, `enfocado` (opacidad en tabs).
+- Export: `iconoPorReaccion(tipo)` para mapear reacciones del feed.
+- **Prohibido** en UI de producto: emojis Unicode como sustituto de iconos.
+
+Nombres habituales: `inicio`, `notificaciones`, `perfil`, `buscar`, `cerrar`, `corazon`, `corazon-vacio`, `me-gusta`, `fuego`, `increible`, `curioso`, `ojo`, `ojo-cerrado`, `alerta`, `confirmar`.
+
+### Componentes de dominio (fuera del kit base)
+`BarraBusqueda`, `BotonesReaccion`, `ModalDenuncia`, `TarjetaPublicacion`, etc. — usan `Icono` donde corresponda.
+
 ## Layout mobile-first
 
 - Padding horizontal estándar de pantalla: `espaciado.lg` (16px)

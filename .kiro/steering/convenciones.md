@@ -17,7 +17,8 @@ TODO el proyecto debe estar en español:
 | Servicios             | camelCase     | `servicioPublicaciones`        |
 | Interfaces / Types    | PascalCase    | `Publicacion`, `RespuestaFeed` |
 | Variables / funciones | camelCase     | `totalComentarios`, `cargar()` |
-| Archivos              | kebab-case    | `tarjeta-publicacion.tsx`      |
+| Archivos componentes  | PascalCase    | `TarjetaPublicacion.tsx`       |
+| Archivos hooks/servicios | camelCase  | `useFeed.ts`, `servicioSocket.ts` |
 | Carpetas              | kebab-case    | `feed-ia/`, `tiempo-real/`     |
 | Controladores backend | camelCase     | `controladorAuth`              |
 | Rutas backend         | kebab-case    | `auth.rutas.ts`                |
@@ -27,15 +28,22 @@ TODO el proyecto debe estar en español:
 ### `mobile/src/`
 ```
 mobile/src/
-├── components/    -- componentes reutilizables (solo UI, sin lógica de negocio)
-├── screens/       -- pantallas completas (una por vista)
+├── components/    -- UI reutilizable (incluye Icono.tsx)
+├── screens/       -- pantallas completas
 ├── hooks/         -- lógica con estado (useXxx)
-├── services/      -- llamadas HTTP y WebSocket (axios, socket.io-client)
-├── navigation/    -- navegadores y constantes de rutas
-├── styles/        -- tokens de diseño (colores, tipografía, espaciado)
-├── types/         -- interfaces y types TypeScript
-└── utils/         -- funciones puras de utilidad
+├── modules/auth/  -- dominio autenticación (pantallas, hooks, API, storage)
+├── services/      -- HTTP y Socket.IO
+├── navigation/    -- navegadores y rutas
+├── context/       -- providers globales
+├── styles/        -- tokens de diseño
+├── types/         -- interfaces TypeScript
+└── utils/         -- helpers puros (p. ej. socketDisponible)
 ```
+
+### Iconografía (sin emojis en UI)
+- Usar el componente `Icono` (`mobile/src/components/Icono.tsx`) con nombres semánticos (`inicio`, `buscar`, `corazon`, …).
+- Implementación: Ionicons outline vía `@expo/vector-icons` (estilo alineado a Flowbite/Heroicons).
+- No usar emojis Unicode en botones, tabs, reacciones ni estados vacíos.
 
 ### `backend/src/`
 ```

@@ -1,5 +1,7 @@
 # Tareas de Implementación — Navegación
 
+> La navegación está implementada en `mobile/src/navigation/`. Este checklist es histórico; priorizar `design.md` y el código frente a casillas pendientes.
+
 ## Instalación y configuración
 
 - [ ] Instalar dependencias de React Navigation:
@@ -35,7 +37,7 @@
   - [ ] Stack con `PantallaPerfil`
 - [ ] Crear `NavegadorPrincipal` en `src/navigation/`
   - [ ] Bottom Tab Navigator con los 3 tabs
-  - [ ] Íconos para cada tab (Feed, Notificaciones, Perfil)
+  - [x] Íconos para cada tab vía componente `Icono` (inicio, notificaciones, perfil)
   - [ ] Badge en tab de Notificaciones conectado a `ContextoNotificaciones`
   - [ ] Estilos de la barra de tabs alineados con el sistema de diseño
 - [ ] Crear `NavegadorRaiz` en `src/navigation/`

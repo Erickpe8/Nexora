@@ -1,18 +1,23 @@
 import React from 'react'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
-import { Text, View } from 'react-native'
+import { View } from 'react-native'
 import type { ParamsTabs } from '../types/navegacion'
 import NavegadorFeed from './NavegadorFeed'
 import NavegadorNotificaciones from './NavegadorNotificaciones'
 import NavegadorPerfil from './NavegadorPerfil'
 import { colores } from '../styles'
-import { BadgeNotificaciones } from '../components'
+import { BadgeNotificaciones, Icono } from '../components'
+import type { NombreIcono } from '../components/Icono'
 
 const Tab = createBottomTabNavigator<ParamsTabs>()
 
-// Íconos de texto simples hasta integrar una librería de íconos
-const IconoTab = ({ emoji, enfocado }: { emoji: string; enfocado: boolean }) => (
-  <Text style={{ fontSize: 20, opacity: enfocado ? 1 : 0.5 }}>{emoji}</Text>
+const IconoTab = ({ nombre, enfocado }: { nombre: NombreIcono; enfocado: boolean }) => (
+  <Icono
+    nombre={nombre}
+    tamano={22}
+    color={enfocado ? colores.acento : colores.textoSecundario}
+    enfocado={enfocado}
+  />
 )
 
 const NavegadorPrincipal = () => {
@@ -38,7 +43,7 @@ const NavegadorPrincipal = () => {
         component={NavegadorFeed}
         options={{
           tabBarLabel: 'Feed',
-          tabBarIcon: ({ focused }) => <IconoTab emoji="🏠" enfocado={focused} />,
+          tabBarIcon: ({ focused }) => <IconoTab nombre="inicio" enfocado={focused} />,
         }}
       />
       <Tab.Screen
@@ -48,7 +53,7 @@ const NavegadorPrincipal = () => {
           tabBarLabel: 'Notificaciones',
           tabBarIcon: ({ focused }) => (
             <View>
-              <IconoTab emoji="🔔" enfocado={focused} />
+              <IconoTab nombre="notificaciones" enfocado={focused} />
               <BadgeNotificaciones />
             </View>
           ),
@@ -59,7 +64,7 @@ const NavegadorPrincipal = () => {
         component={NavegadorPerfil}
         options={{
           tabBarLabel: 'Perfil',
-          tabBarIcon: ({ focused }) => <IconoTab emoji="👤" enfocado={focused} />,
+          tabBarIcon: ({ focused }) => <IconoTab nombre="perfil" enfocado={focused} />,
         }}
       />
     </Tab.Navigator>

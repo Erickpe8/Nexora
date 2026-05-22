@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { View, TextInput, TouchableOpacity, TextInputProps } from 'react-native'
 import Texto from './Texto'
+import Icono from './Icono'
 
 type TipoEntrada = 'texto' | 'contrasena' | 'email'
 
@@ -53,18 +54,25 @@ const Entrada = ({
             onPress={() => setMostrarContrasena(!mostrarContrasena)}
             activeOpacity={0.7}
             className="pl-2"
+            accessibilityRole="button"
+            accessibilityLabel={mostrarContrasena ? 'Ocultar contraseña' : 'Mostrar contraseña'}
           >
-            <Texto variante="caption" color="#9A9A9A">
-              {mostrarContrasena ? 'Ocultar' : 'Ver'}
-            </Texto>
+            <Icono
+              nombre={mostrarContrasena ? 'ojo-cerrado' : 'ojo'}
+              tamano={20}
+              color="#9A9A9A"
+            />
           </TouchableOpacity>
         )}
       </View>
 
       {error && (
-        <Texto variante="caption" color="#F44336" className="mt-1">
-          {error}
-        </Texto>
+        <View className="mt-1 flex-row items-center gap-1">
+          <Icono nombre="alerta" tamano={14} color="#F44336" />
+          <Texto variante="caption" color="#F44336" className="flex-1">
+            {error}
+          </Texto>
+        </View>
       )}
     </View>
   )

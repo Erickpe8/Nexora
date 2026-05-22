@@ -1,4 +1,4 @@
-import type { ItemHistorial, PerfilPublico, PerfilUsuario } from '../types'
+import type { ActualizarPerfil, ItemHistorial, PerfilPublico, PerfilUsuario } from '../types'
 import { clienteApi, RespuestaDatos } from './api'
 
 export const servicioPerfil = {
@@ -9,13 +9,15 @@ export const servicioPerfil = {
     return respuesta.data.datos
   },
 
-  async actualizarNombre(token: string, nombre: string): Promise<PerfilUsuario> {
-    const respuesta = await clienteApi.patch<RespuestaDatos<PerfilUsuario>>(
-      '/usuarios/perfil',
-      { nombre },
-      { headers: { Authorization: `Bearer ${token}` } }
-    )
+  async actualizarPerfil(token: string, datos: ActualizarPerfil): Promise<PerfilUsuario> {
+    const respuesta = await clienteApi.patch<RespuestaDatos<PerfilUsuario>>('/usuarios/perfil', datos, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
     return respuesta.data.datos
+  },
+
+  async actualizarNombre(token: string, nombre: string): Promise<PerfilUsuario> {
+    return servicioPerfil.actualizarPerfil(token, { nombre })
   },
 
   async obtenerPerfilPublico(token: string, id: number): Promise<PerfilPublico> {

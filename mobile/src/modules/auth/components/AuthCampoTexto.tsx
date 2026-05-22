@@ -6,8 +6,8 @@ import {
   Pressable,
   Platform,
 } from 'react-native'
-import { MaterialCommunityIcons } from '@expo/vector-icons'
 import Texto from '../../../components/Texto'
+import Icono from '../../../components/Icono'
 
 type TipoCampo = 'texto' | 'email' | 'contrasena'
 
@@ -72,18 +72,14 @@ export const AuthCampoTexto = ({
             onPress={() => setMostrar(m => !m)}
             className="justify-center border-l border-auth-stroke px-3 active:bg-auth-elevated"
           >
-            <MaterialCommunityIcons
-              name={mostrar ? 'eye-off-outline' : 'eye-outline'}
-              size={22}
-              color="#a1a1aa"
-            />
+            <Icono nombre={mostrar ? 'ojo-cerrado' : 'ojo'} tamano={22} color="#a1a1aa" />
           </Pressable>
         ) : null}
       </View>
       {indicadorFuerza}
       {error ? (
         <View className="mt-2 flex-row items-start gap-1.5 rounded-xl bg-error/10 px-3 py-2">
-          <MaterialCommunityIcons name="alert-circle-outline" size={16} color="#f87171" />
+          <Icono nombre="alerta" tamano={16} color="#f87171" />
           <Texto variante="caption" className="flex-1 leading-5 text-red-300">
             {error}
           </Texto>

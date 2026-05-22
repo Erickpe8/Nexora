@@ -4,5 +4,12 @@ export type { Usuario, RespuestaAuth, CredencialesLogin, DatosRegistro } from '.
 export type { Publicacion, RespuestaFeed, TipoReaccion, ResumenReacciones } from './feed'
 export type { Comentario, NuevoComentario } from './comentarios'
 export type { Notificacion, TipoNotificacion, EstadoNotificaciones } from './notificaciones'
-export type { PerfilUsuario, PerfilPublico, ItemHistorial, ActualizarPerfil } from './perfil'
+export type {
+  PerfilUsuario,
+  PerfilPublico,
+  PerfilBase,
+  ItemHistorial,
+  ActualizarPerfil,
+  RedesSociales,
+} from './perfil'
 export type { NuevaDenuncia, MotivosDenuncia } from './moderacion'

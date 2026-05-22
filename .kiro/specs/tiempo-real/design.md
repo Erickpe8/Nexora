@@ -2,7 +2,17 @@
 
 ## Arquitectura general
 
-La capa de tiempo real usa Socket.IO sobre WebSockets. El servidor gestiona salas (rooms) por publicación y un canal global para el feed. El cliente mantiene una única conexión persistente durante la sesión.
+La capa de tiempo real usa Socket.IO sobre WebSockets cuando el backend corre con `server.ts` (desarrollo local o VPS). El servidor gestiona salas por publicación y `feed_global`. En **Vercel serverless** no hay servidor Socket.IO persistente.
+
+### Limitaciones por entorno (mobile)
+
+| Entorno | Socket |
+|---------|--------|
+| App nativa + API local (`server.ts`) | Conecta |
+| Expo Web en localhost → API local | Conecta si API no es vercel.app |
+| Producción `*.vercel.app` (web o nativo) | **No conecta** (`utils/socketDisponible.ts`) |
+
+Sin socket, el usuario actualiza el feed manualmente (pull-to-refresh / banner de nuevas publicaciones no dispara por push).
 
 ## Componentes frontend
 

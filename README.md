@@ -74,18 +74,18 @@ npm start                    # abrir en Expo Go, Android Emulator o iOS Simulato
 
 | Fase | Módulo | Estado |
 |------|--------|--------|
-| 1 | Bootstrap Backend | ✅ |
-| 2 | UI Global (sistema de diseño) | ✅ |
-| 3 | Navegación | ✅ |
-| 4 | Autenticación | ✅ |
-| 5 | Feed + IA | ✅ |
-| 6 | Comentarios | ✅ |
-| 7 | Notificaciones | ✅ |
-| 8 | Perfil de Usuario | ✅ |
-| 9 | Observabilidad | ✅ |
-| 10 | Gestión de Configuración | ✅ |
-| 11 | Pipeline IA (Fase B) | ✅ |
-| 12 | Moderación y Confianza | ✅ |
+| 1 | Bootstrap Backend | Completado |
+| 2 | UI Global + iconos (`Icono`) | Completado |
+| 3 | Navegación | Completado |
+| 4 | Autenticación | Completado |
+| 5 | Feed + IA | Completado |
+| 6 | Comentarios + likes | Completado |
+| 7 | Notificaciones | Completado |
+| 8 | Perfil de Usuario | Completado |
+| 9 | Observabilidad | Completado |
+| 10 | Gestión de Configuración | Completado |
+| 11 | Pipeline IA + cron Vercel | Completado |
+| 12 | Moderación y Confianza | Completado |
 
 ---
 
@@ -96,10 +96,14 @@ npm start                    # abrir en Expo Go, Android Emulator o iOS Simulato
 
 ---
 
+## Deploy en Vercel
+
+Ver [docs/DEPLOY-VERCEL.md](docs/DEPLOY-VERCEL.md). Resumen: MySQL en Railway, `npm run vercel:finalizar`, redeploy. La IA publica **4 posts** al primer acceso tras deploy y **4 cada hora** con Vercel Cron.
+
 ## Documentación técnica
 
-- Arquitectura: `.kiro/steering/arquitectura-monorepo.md`
-- Stack: `.kiro/steering/stack.md`
-- Roadmap: `.kiro/steering/roadmap-desarrollo.md`
-- Specs por módulo: `.kiro/specs/`
-- API completa: `backend/README.md`
+- Índice general: [docs/README.md](docs/README.md)
+- Índice Kiro (specs + steering): [.kiro/README.md](.kiro/README.md)
+- Onboarding: [docs/onboarding.md](docs/onboarding.md)
+- Arquitectura: [docs/arquitectura.md](docs/arquitectura.md)
+- API backend: `backend/README.md`

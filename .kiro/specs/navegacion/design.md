@@ -39,9 +39,9 @@ NavegadorRaiz (Stack)
 ```typescript
 // src/navigation/NavegadorPrincipal.tsx
 // Bottom Tab Navigator
-// Tab icons: Feed (home), Notificaciones (bell), Perfil (user)
+// Tab icons: componente Icono — inicio | notificaciones | perfil (Ionicons outline)
 // Badge en tab de Notificaciones desde ContextoNotificaciones
-// Barra de tabs con fondo fondoTarjeta y acento para tab activo
+// Barra de tabs: fondoTarjeta, acento en tab activo, sin emojis en labels ni iconos
 ```
 
 ### `NavegadorFeed`

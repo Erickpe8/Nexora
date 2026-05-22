@@ -1,7 +1,8 @@
 import { Response, NextFunction, Request } from 'express'
 import type { RequestAutenticado } from '../types'
+import type { ActualizarPerfilDto } from '../types'
 import {
-  actualizarNombrePerfil,
+  actualizarPerfil,
   obtenerHistorialComentarios,
   obtenerPerfilPropio,
   obtenerPerfilPublico,
@@ -28,7 +29,14 @@ export const controladorActualizarPerfil = async (
 ): Promise<void> => {
   try {
     const { id } = (req as RequestAutenticado).usuario
-    const datos = await actualizarNombrePerfil(id, String(req.body.nombre ?? ''))
+    const cuerpo = req.body as ActualizarPerfilDto
+    const datos = await actualizarPerfil(id, {
+      nombre: cuerpo.nombre,
+      biografia: cuerpo.biografia,
+      fotoPerfilUrl: cuerpo.fotoPerfilUrl,
+      fechaNacimiento: cuerpo.fechaNacimiento,
+      redesSociales: cuerpo.redesSociales,
+    })
     res.status(200).json({ datos })
   } catch (error) {
     next(error)

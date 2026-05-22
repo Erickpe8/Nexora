@@ -2,11 +2,15 @@ import { pool, verificarConexion } from '../../shared/database/pool'
 
 const tablas = [
   `CREATE TABLE IF NOT EXISTS usuarios (
-    id           INT AUTO_INCREMENT PRIMARY KEY,
-    nombre       VARCHAR(30) NOT NULL,
-    correo       VARCHAR(255) NOT NULL UNIQUE,
-    contrasena   VARCHAR(255) NOT NULL,
-    creado_en    DATETIME DEFAULT NOW(),
+    id                INT AUTO_INCREMENT PRIMARY KEY,
+    nombre            VARCHAR(30) NOT NULL,
+    correo            VARCHAR(255) NOT NULL UNIQUE,
+    contrasena        VARCHAR(255) NOT NULL,
+    biografia         VARCHAR(500) DEFAULT NULL,
+    foto_perfil_url   VARCHAR(500) DEFAULT NULL,
+    fecha_nacimiento  DATE DEFAULT NULL,
+    redes_sociales    JSON DEFAULT NULL,
+    creado_en         DATETIME DEFAULT NOW(),
     INDEX idx_correo (correo)
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`,
 
@@ -98,6 +102,12 @@ const tablas = [
     INDEX idx_objetivo (tipo_objetivo, objetivo_id, creado_en),
     INDEX idx_autor (autor_id),
     INDEX idx_estado (estado)
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`,
+
+  `CREATE TABLE IF NOT EXISTS estado_sistema (
+    clave VARCHAR(64) PRIMARY KEY,
+    valor VARCHAR(255) NOT NULL,
+    actualizado_en DATETIME DEFAULT NOW()
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`,
 ]
 

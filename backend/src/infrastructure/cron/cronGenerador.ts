@@ -8,7 +8,7 @@ const CONTEXTO = 'CronGenerador'
 let enEjecucion = false
 let fallosConsecutivos = 0
 
-const ejecutarCicloGeneracion = async (): Promise<void> => {
+export const ejecutarCicloGeneracionIA = async (): Promise<void> => {
   if (enEjecucion) {
     registro.advertencia(CONTEXTO, 'Ciclo anterior aún en ejecución — omitiendo solapamiento')
     return
@@ -46,8 +46,11 @@ const ejecutarCicloGeneracion = async (): Promise<void> => {
 }
 
 export const iniciarCronGenerador = (): void => {
+  registro.info(CONTEXTO, 'Generación inicial al arrancar (4 publicaciones)…')
+  void ejecutarCicloGeneracionIA()
+
   cron.schedule('0 * * * *', () => {
-    void ejecutarCicloGeneracion()
+    void ejecutarCicloGeneracionIA()
   })
-  registro.info(CONTEXTO, 'Cron de generación IA iniciado — ejecución cada hora en punto')
+  registro.info(CONTEXTO, 'Cron horario activo — cada hora en punto (4 publicaciones por ciclo)')
 }

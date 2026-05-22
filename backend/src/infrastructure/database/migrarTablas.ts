@@ -95,6 +95,14 @@ const migraciones: MigracionSQL[] = [
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`,
   },
   {
+    descripcion: 'Crear tabla estado_sistema (semilla post-deploy)',
+    sql: `CREATE TABLE IF NOT EXISTS estado_sistema (
+      clave VARCHAR(64) PRIMARY KEY,
+      valor VARCHAR(255) NOT NULL,
+      actualizado_en DATETIME DEFAULT NOW()
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`,
+  },
+  {
     descripcion: 'Crear tabla denuncias',
     sql: `CREATE TABLE IF NOT EXISTS denuncias (
       id            INT AUTO_INCREMENT PRIMARY KEY,
@@ -136,6 +144,13 @@ const migrarTablas = async (): Promise<void> => {
     { nombre: 'version_prompt',       definicion: 'version_prompt VARCHAR(20) DEFAULT NULL AFTER proveedor_ia' },
     { nombre: 'hash_contenido',       definicion: 'hash_contenido VARCHAR(64) DEFAULT NULL AFTER version_prompt' },
     { nombre: 'metadatos_generacion', definicion: 'metadatos_generacion JSON DEFAULT NULL AFTER hash_contenido' },
+  ])
+
+  await agregarColumnasSiNoExisten('usuarios', [
+    { nombre: 'biografia', definicion: 'biografia VARCHAR(500) DEFAULT NULL AFTER contrasena' },
+    { nombre: 'foto_perfil_url', definicion: 'foto_perfil_url VARCHAR(500) DEFAULT NULL AFTER biografia' },
+    { nombre: 'fecha_nacimiento', definicion: 'fecha_nacimiento DATE DEFAULT NULL AFTER foto_perfil_url' },
+    { nombre: 'redes_sociales', definicion: 'redes_sociales JSON DEFAULT NULL AFTER fecha_nacimiento' },
   ])
 
   await agregarColumnasSiNoExisten('comentarios', [

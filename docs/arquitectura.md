@@ -125,25 +125,37 @@ backend/src/
 | `denuncias` | Reportes de contenido |
 | `versiones_prompt_ia` | Historial de prompts DeepSeek |
 | `registros_generacion_ia` | Trazabilidad del pipeline IA |
+| `reacciones_publicacion` | Reacciones en posts |
+| `likes_comentario` | Likes en comentarios |
+| `denuncias` | Reportes de contenido |
+| `estado_sistema` | Control de semilla post-deploy (Vercel) |
 
 ---
+
+## Despliegue en Vercel
+
+- **Web:** `mobile/dist` (Expo export) servido como estático.
+- **API:** `api/index.ts` → `backend/dist/app` (sin Socket.IO ni cron en el proceso serverless).
+- **IA en producción:** semilla de 4 posts tras cada deploy (primera petición) + cron horario en `vercel.json`.
+- **MySQL:** Railway u otro proveedor vía `MYSQL_URL` + `DB_SSL=true`.
+- Guía paso a paso: [DEPLOY-VERCEL.md](DEPLOY-VERCEL.md)
 
 ## Fases implementadas
 
 | Fase | Módulo | Estado |
 |------|--------|--------|
-| 1 | Bootstrap Backend | ✅ |
-| 2 | UI Global (sistema de diseño) | ✅ |
-| 3 | Navegación | ✅ |
-| 4 | Autenticación | ✅ |
-| 5 | Feed + IA | ✅ |
-| 6 | Comentarios | ✅ |
-| 7 | Notificaciones | ✅ |
-| 8 | Perfil de Usuario | ✅ |
-| 9 | Observabilidad de Plataforma | ✅ |
-| 10 | Gestión de Configuración y Secretos | ✅ |
-| 11 | Pipeline de Generación IA (Fase B) | ✅ |
-| 12 | Moderación y Confianza de Contenido | ✅ |
+| 1 | Bootstrap Backend | Completado |
+| 2 | UI Global (sistema de diseño + Icono) | Completado |
+| 3 | Navegación | Completado |
+| 4 | Autenticación | Completado |
+| 5 | Feed + IA | Completado |
+| 6 | Comentarios | Completado |
+| 7 | Notificaciones | Completado |
+| 8 | Perfil de Usuario | Completado |
+| 9 | Observabilidad de Plataforma | Completado |
+| 10 | Gestión de Configuración y Secretos | Completado |
+| 11 | Pipeline de Generación IA | Completado |
+| 12 | Moderación y Confianza de Contenido | Completado |
 
 ---
 
@@ -166,7 +178,8 @@ backend/src/
 
 ## Referencias
 
-- Detalle de arquitectura: `.kiro/steering/arquitectura-monorepo.md`
-- Stack tecnológico: `.kiro/steering/stack.md`
-- Convenciones de código: `.kiro/steering/convenciones.md`
-- Specs por módulo: `.kiro/specs/`
+- Índice Kiro: [.kiro/README.md](../.kiro/README.md)
+- Detalle de arquitectura: [.kiro/steering/arquitectura-monorepo.md](../.kiro/steering/arquitectura-monorepo.md)
+- Stack: [.kiro/steering/stack.md](../.kiro/steering/stack.md)
+- Convenciones (incl. `Icono`): [.kiro/steering/convenciones.md](../.kiro/steering/convenciones.md)
+- Specs por módulo: [.kiro/specs/](../.kiro/specs/)

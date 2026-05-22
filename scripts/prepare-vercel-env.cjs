@@ -3,6 +3,7 @@
  */
 const fs = require('node:fs')
 const path = require('node:path')
+const crypto = require('node:crypto')
 
 const root = path.resolve(__dirname, '..')
 const URL_API_PROD = 'https://nexora-ruddy-nine.vercel.app/api'
@@ -60,6 +61,9 @@ const main = () => {
     '',
     `DEEPSEEK_API_KEY=${b.get('DEEPSEEK_API_KEY') || ''}`,
     `DEEPSEEK_URL=${b.get('DEEPSEEK_URL') || 'https://api.deepseek.com/v1/chat/completions'}`,
+    '',
+    `CRON_SECRET=${b.get('CRON_SECRET') || crypto.randomBytes(32).toString('hex')}`,
+    `INTERNO_API_KEY=${b.get('INTERNO_API_KEY') || 'nexora_interno_dev'}`,
     '',
     'NODE_ENV=production',
     '',

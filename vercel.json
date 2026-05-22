@@ -9,9 +9,15 @@
     "api/index.ts": {
       "includeFiles": "backend/dist/**",
       "memory": 1024,
-      "maxDuration": 30
+      "maxDuration": 60
     }
   },
+  "crons": [
+    {
+      "path": "/api/cron/generar-ia",
+      "schedule": "0 * * * *"
+    }
+  ],
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/api" },
     { "source": "/:path*", "destination": "/" }

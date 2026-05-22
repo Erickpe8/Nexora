@@ -56,7 +56,7 @@ const logPeticionApi = (config: InternalAxiosRequestConfig) => {
   const url = urlCompletaPeticion(config)
   const origenWeb =
     Platform.OS === 'web' && typeof window !== 'undefined' ? window.location?.origin ?? '' : ''
-  console.log('[Nexora API →]', config.method?.toUpperCase() ?? 'GET', url, {
+  console.log('[Nexora API req]', config.method?.toUpperCase() ?? 'GET', url, {
     timeoutMs: config.timeout,
     plataforma: Platform.OS,
     ...(origenWeb ? { origenWeb } : {}),
@@ -66,7 +66,7 @@ const logPeticionApi = (config: InternalAxiosRequestConfig) => {
 const logErrorApi = (error: unknown) => {
   if (!logApiHabilitado) return
   if (!axios.isAxiosError(error)) {
-    console.warn('[Nexora API ✗]', error)
+    console.warn('[Nexora API error]', error)
     return
   }
   const c = error.config
@@ -75,7 +75,7 @@ const logErrorApi = (error: unknown) => {
     Platform.OS === 'web' && typeof window !== 'undefined'
       ? { hostname: window.location?.hostname, origin: window.location?.origin }
       : undefined
-  console.warn('[Nexora API ✗]', {
+  console.warn('[Nexora API error]', {
     url,
     metodo: c?.method,
     mensaje: error.message,
@@ -92,7 +92,7 @@ const logRespuestaOk = (status: number, config: InternalAxiosRequestConfig) => {
   if (!logApiHabilitado) return
   const path = config.url ?? ''
   if (!path.includes('/auth/')) return
-  console.log('[Nexora API ← ok]', status, urlCompletaPeticion(config))
+  console.log('[Nexora API ok]', status, urlCompletaPeticion(config))
 }
 
 const tiempoLimiteMs = (() => {

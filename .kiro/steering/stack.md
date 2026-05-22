@@ -11,7 +11,8 @@
 | Socket.IO Client    | Conexión WebSocket para tiempo real      |
 | NativeWind          | Estilos con clases TailwindCSS           |
 | React Navigation    | Navegación entre pantallas               |
-| AsyncStorage        | Persistencia local del token JWT         |
+| AsyncStorage / SecureStore | Persistencia del token JWT        |
+| @expo/vector-icons (Ionicons) | Iconografía UI (`Icono.tsx`)   |
 
 ## `backend/` — Servidor Node.js
 
@@ -42,8 +43,10 @@
 
 | Tecnología          | Uso                                      |
 |---------------------|------------------------------------------|
-| MySQL               | Base de datos principal                  |
-| docker-compose      | Orquestación local de servicios          |
+| MySQL               | Base de datos (local Docker o Railway)   |
+| docker-compose      | MySQL local en puerto 3307               |
+| Vercel              | Hosting web estático + API serverless    |
+| Railway (u otro)    | MySQL remoto (`MYSQL_URL`) en producción |
 
 ## Separación estricta de dependencias
 

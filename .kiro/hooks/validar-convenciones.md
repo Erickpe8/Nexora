@@ -10,7 +10,8 @@ Verificar que el código generado o modificado cumple con las convenciones defin
 - [ ] Funciones en español y camelCase (`function obtenerPerfil()`, no `function getProfile()`)
 - [ ] Interfaces y types en español y PascalCase (`interface PerfilUsuario`, no `interface UserProfile`)
 - [ ] Componentes en español y PascalCase (`TarjetaPublicacion`, no `PostCard`)
-- [ ] Archivos en español y kebab-case (`tarjeta-publicacion.tsx`, no `PostCard.tsx`)
+- [ ] Archivos de componentes en PascalCase (`TarjetaPublicacion.tsx`, no `PostCard.tsx`)
+- [ ] Hooks/servicios en camelCase (`useFeed.ts`, `servicioPublicaciones.ts`)
 - [ ] Carpetas en español y kebab-case
 
 ### Estructura
@@ -20,6 +21,9 @@ Verificar que el código generado o modificado cumple con las convenciones defin
 - [ ] Servicios en `src/services/` con sufijo `servicio` (`servicioAuth`)
 - [ ] Tipos en `src/types/`
 - [ ] Utilidades en `src/utils/`
+
+### UI
+- [ ] Iconografía vía componente `Icono` (Ionicons), no emojis Unicode en botones/tabs/reacciones
 
 ### Código
 - [ ] No hay `any` sin justificación

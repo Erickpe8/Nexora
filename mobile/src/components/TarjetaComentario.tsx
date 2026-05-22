@@ -10,7 +10,8 @@ import { useLikeComentario } from '../hooks/useLikeComentario'
 import { useContextoAuth } from '../context/ContextoAutenticacion'
 import type { MotivosDenuncia } from '../types/moderacion'
 import { colores } from '../styles/colores'
-import { tipografia } from '../styles/tipografia'
+import { espaciado } from '../styles/espaciado'
+import Icono from './Icono'
 
 interface PropsTarjetaComentario {
   comentario: Comentario
@@ -79,15 +80,23 @@ const TarjetaComentario = ({
               tamano="sm"
               onPress={() => void alternarLike()}
               disabled={enviandoLike}
+              accessibilityLabel={meDioLike ? 'Quitar me gusta' : 'Me gusta'}
             >
-              <Texto
-                style={{
-                  fontSize: tipografia.tamanos.sm,
-                  color: meDioLike ? colores.acento : colores.textoSecundario,
-                }}
-              >
-                {meDioLike ? '❤️' : '🤍'} {totalLikes > 0 ? String(totalLikes) : ''}
-              </Texto>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: espaciado.xs }}>
+                <Icono
+                  nombre={meDioLike ? 'corazon' : 'corazon-vacio'}
+                  tamano={18}
+                  color={meDioLike ? colores.acento : colores.textoSecundario}
+                />
+                {totalLikes > 0 ? (
+                  <Texto
+                    variante="caption"
+                    color={meDioLike ? colores.acento : colores.textoSecundario}
+                  >
+                    {String(totalLikes)}
+                  </Texto>
+                ) : null}
+              </View>
             </Boton>
           ) : null}
 

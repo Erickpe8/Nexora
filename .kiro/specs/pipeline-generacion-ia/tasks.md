@@ -14,10 +14,13 @@
 - [x] Tabla `registros_generacion_ia` (una fila por ítem de ejecución).
 - [x] Deduplicación por hash SHA-256 de contenido (además de título).
 
-## Fase C — API interna
+## Fase C — API interna y cron
 
 - [x] `POST /api/interno/ia/generar` con protección por API key (`X-Interno-Api-Key`).
-- [x] Rate limit específico (5 disparos/hora).
+- [x] `GET /api/cron/generar-ia` (Vercel Cron + `CRON_SECRET`).
+- [x] Rate limit específico (5 disparos/hora en ruta interna).
+- [x] Semilla: 4 posts al arrancar `server.ts` y en primer request post-deploy (Vercel).
+- [x] Cron horario `0 * * * *` (local y `vercel.json`).
 
 ## Fase D — Colas (SPEC hermano)
 

@@ -9,6 +9,7 @@ import {
 } from 'react-native'
 import Texto from './Texto'
 import Boton from './Boton'
+import Icono from './Icono'
 import { colores } from '../styles'
 import type { MotivosDenuncia } from '../types/moderacion'
 
@@ -77,14 +78,20 @@ const ModalDenuncia = ({
             {/* Cabecera */}
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
               <Texto variante="subtitulo">Denunciar comentario</Texto>
-              <TouchableOpacity onPress={alCerrar} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
-                <Texto variante="cuerpo" color={colores.textoSecundario}>✕</Texto>
+              <TouchableOpacity
+                onPress={alCerrar}
+                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                accessibilityRole="button"
+                accessibilityLabel="Cerrar"
+              >
+                <Icono nombre="cerrar" tamano={22} color={colores.textoSecundario} />
               </TouchableOpacity>
             </View>
 
             {enviada ? (
               /* Estado confirmación */
               <View style={{ alignItems: 'center', paddingVertical: 24 }}>
+                <Icono nombre="confirmar" tamano={40} color={colores.exito} style={{ marginBottom: 12 }} />
                 <Texto variante="subtitulo" color={colores.exito} style={{ marginBottom: 8 }}>
                   Denuncia enviada
                 </Texto>

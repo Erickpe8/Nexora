@@ -2,15 +2,15 @@ import React from 'react'
 import { View, TouchableOpacity } from 'react-native'
 import type { TipoReaccion } from '../types'
 import { colores } from '../styles/colores'
-import { tipografia } from '../styles/tipografia'
 import { espaciado } from '../styles/espaciado'
 import Texto from './Texto'
+import Icono, { iconoPorReaccion } from './Icono'
 
-const REACCIONES: { tipo: TipoReaccion; emoji: string; etiqueta: string }[] = [
-  { tipo: 'me_gusta',       emoji: '👍', etiqueta: 'Me gusta' },
-  { tipo: 'fuego',          emoji: '🔥', etiqueta: 'Fuego' },
-  { tipo: 'mente_explotada', emoji: '🤯', etiqueta: 'Increíble' },
-  { tipo: 'curioso',        emoji: '🤔', etiqueta: 'Curioso' },
+const REACCIONES: { tipo: TipoReaccion; etiqueta: string }[] = [
+  { tipo: 'me_gusta', etiqueta: 'Me gusta' },
+  { tipo: 'fuego', etiqueta: 'Fuego' },
+  { tipo: 'mente_explotada', etiqueta: 'Increíble' },
+  { tipo: 'curioso', etiqueta: 'Curioso' },
 ]
 
 interface PropsBotonesReaccion {
@@ -31,13 +31,15 @@ const BotonesReaccion = ({ miReaccion, total, enviando, onAlternar }: PropsBoton
         marginTop: espaciado.sm,
       }}
     >
-      {REACCIONES.map(({ tipo, emoji }) => {
+      {REACCIONES.map(({ tipo, etiqueta }) => {
         const activo = miReaccion === tipo
         return (
           <TouchableOpacity
             key={tipo}
             onPress={() => onAlternar(tipo)}
             disabled={enviando}
+            accessibilityRole="button"
+            accessibilityLabel={etiqueta}
             style={{
               flexDirection: 'row',
               alignItems: 'center',
@@ -50,7 +52,11 @@ const BotonesReaccion = ({ miReaccion, total, enviando, onAlternar }: PropsBoton
               opacity: enviando ? 0.6 : 1,
             }}
           >
-            <Texto style={{ fontSize: tipografia.tamanos.base }}>{emoji}</Texto>
+            <Icono
+              nombre={iconoPorReaccion(tipo)}
+              tamano={18}
+              color={activo ? colores.acento : colores.textoSecundario}
+            />
           </TouchableOpacity>
         )
       })}
@@ -58,7 +64,7 @@ const BotonesReaccion = ({ miReaccion, total, enviando, onAlternar }: PropsBoton
       {total > 0 ? (
         <Texto
           style={{
-            fontSize: tipografia.tamanos.xs,
+            fontSize: 12,
             color: colores.textoSecundario,
             marginLeft: espaciado.xs,
           }}

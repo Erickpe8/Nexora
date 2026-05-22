@@ -58,11 +58,15 @@ Nexora/
 ├── mobile/           → React Native + Expo (cliente móvil)
 ├── backend/          → API REST + WebSockets + Cron Jobs
 ├── .kiro/            → Metodología, specs y steering
-├── docs/             → Documentación general del proyecto
+├── docs/             → Documentación general (ver docs/README.md)
+├── api/              → Entrada serverless Vercel
+├── scripts/          → Build y variables de entorno Vercel
 └── docker-compose.yml
 ```
 
-`mobile/` y `backend/` son proyectos **completamente independientes**. Cada uno tiene su propio `package.json` y sus propias dependencias. Solo se comunican a través de la API REST y eventos WebSocket.
+`mobile/` y `backend/` son proyectos **completamente independientes**. Cada uno tiene su propio `package.json` y sus propias dependencias. Solo se comunican a través de la API REST y eventos WebSocket (Socket solo con `server.ts` en local).
+
+Índice rápido: [.kiro/README.md](../.kiro/README.md) · [docs/README.md](README.md)
 
 ---
 
@@ -126,7 +130,8 @@ cd backend
 cp .env.example .env      # configurar variables de entorno
 npm install
 npm run tablas            # crear tablas (base de datos nueva)
-npm run dev               # servidor en http://localhost:4010
+npm run migrar            # si la BD ya existía: tablas/columnas del ZIP (reacciones, likes, …)
+npm run dev               # servidor en http://localhost:4010 (+ 4 posts al arrancar, luego cada hora)
 ```
 
 ### Verificar que funciona
@@ -215,14 +220,22 @@ Mantener siempre:
 - Buen tipado TypeScript (sin `any` sin justificación).
 - Sin código duplicado ni componentes gigantes.
 - Sin estilos inconsistentes ni arquitectura improvisada.
+- **Iconografía:** usar `Icono` (Ionicons outline), no emojis en la interfaz.
+
+## Deploy en Vercel (producción)
+
+Ver [DEPLOY-VERCEL.md](DEPLOY-VERCEL.md). Variables clave: `MYSQL_URL`, `DB_SSL`, `DEEPSEEK_API_KEY`, `CRON_SECRET`, `JWT_SECRETO`.
+
+En Vercel no hay Socket.IO persistente; la web en `*.vercel.app` actualiza el feed por HTTP.
 
 ---
 
 ## Referencias
 
-- Arquitectura: `.kiro/steering/arquitectura-monorepo.md`
-- Stack: `.kiro/steering/stack.md`
-- Convenciones: `.kiro/steering/convenciones.md`
-- Roadmap: `.kiro/steering/roadmap-desarrollo.md`
-- API completa: `backend/README.md`
-- Specs por módulo: `.kiro/specs/`
+- Índice Kiro: [.kiro/README.md](../.kiro/README.md)
+- Arquitectura: [.kiro/steering/arquitectura-monorepo.md](../.kiro/steering/arquitectura-monorepo.md)
+- Stack: [.kiro/steering/stack.md](../.kiro/steering/stack.md)
+- Convenciones (Icono, carpetas): [.kiro/steering/convenciones.md](../.kiro/steering/convenciones.md)
+- Roadmap: [.kiro/steering/roadmap-desarrollo.md](../.kiro/steering/roadmap-desarrollo.md)
+- Deploy: [DEPLOY-VERCEL.md](DEPLOY-VERCEL.md)
+- API: `backend/README.md`

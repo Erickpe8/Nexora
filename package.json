@@ -14,7 +14,8 @@
     "vercel:env": "node scripts/vercel-env-push.cjs",
     "vercel:env:dry": "node scripts/vercel-env-push.cjs --dry-run",
     "vercel:deploy": "npm run vercel:prepare && npm run vercel:env",
-    "vercel:finalizar": "node scripts/finalizar-deploy-vercel.cjs"
+    "vercel:finalizar": "node scripts/finalizar-deploy-vercel.cjs",
+    "vercel:sembrar-feed": "node scripts/disparar-generacion-ia.cjs"
   },
   "dependencies": {
     "expo": "~54.0.33",

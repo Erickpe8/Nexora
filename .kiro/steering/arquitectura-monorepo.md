@@ -4,12 +4,15 @@
 
 ```
 nexora/
-├── mobile/          -- aplicación React Native (cliente móvil)
-├── backend/         -- API REST + WebSockets + cron jobs
-├── .kiro/           -- documentación, specs y steering de Kiro
-├── docs/            -- documentación general del proyecto
-├── README.md        -- descripción general del monorepo
-└── docker-compose.yml -- orquestación de servicios (DB, backend)
+├── mobile/              -- aplicación React Native + export web (Expo)
+├── backend/             -- API REST + WebSockets + cron (Node.js)
+├── api/                 -- entrada serverless Vercel → Express (`crearAplicacion`)
+├── scripts/             -- build/deploy Vercel, env, disparo IA
+├── .kiro/               -- specs, steering y hooks (metodología SDD)
+├── docs/                -- onboarding, arquitectura, deploy
+├── vercel.json          -- build, rewrites, cron horario IA
+├── README.md
+└── docker-compose.yml   -- MySQL local (puerto 3307)
 ```
 
 ## Principio fundamental
@@ -26,14 +29,16 @@ No comparten código fuente. Solo comparten contratos (tipos de API y eventos We
 ```
 mobile/
 ├── src/
-│   ├── components/    -- componentes reutilizables de UI
+│   ├── components/    -- UI reutilizable (Boton, Tarjeta, Icono, …)
 │   ├── screens/       -- pantallas completas
 │   ├── hooks/         -- lógica con estado (useXxx)
-│   ├── services/      -- llamadas HTTP y WebSocket
-│   ├── navigation/    -- navegadores y constantes de rutas
-│   ├── styles/        -- tokens de diseño (colores, tipografía, espaciado)
-│   ├── types/         -- interfaces y types TypeScript
-│   └── utils/         -- funciones puras de utilidad
+│   ├── modules/auth/  -- autenticación (provider, pantallas, API, validadores)
+│   ├── services/      -- HTTP (axios) y Socket.IO client
+│   ├── navigation/    -- navegadores y rutas
+│   ├── context/       -- ContextoAutenticacion, Socket, Notificaciones
+│   ├── styles/        -- tokens (colores, tipografía, espaciado)
+│   ├── types/         -- contratos TypeScript
+│   └── utils/         -- utilidades (p. ej. `socketDisponible.ts`)
 ├── assets/            -- imágenes, íconos, fuentes
 ├── app.json           -- configuración de Expo
 ├── tailwind.config.js -- configuración de NativeWind
@@ -48,26 +53,23 @@ mobile/
 - Socket.IO Client (tiempo real)
 - NativeWind (estilos)
 - React Navigation (navegación)
-- AsyncStorage (persistencia local)
+- AsyncStorage / SecureStore (persistencia de token)
+- `@expo/vector-icons` (Ionicons outline — iconografía sin emojis en UI)
 
 ### Responsabilidades de `mobile/`
-✅ Autenticación (formularios, almacenamiento de token)
-✅ Renderizado del feed de publicaciones
-✅ Comentarios (crear, ver, responder)
-✅ Navegación entre pantallas
-✅ Conexión WebSocket y recepción de eventos realtime
-✅ Consumo de la API REST del backend
-✅ Manejo de estado de UI
-✅ Notificaciones in-app
-✅ Perfil de usuario
+- Autenticación (formularios, almacenamiento de token)
+- Feed, búsqueda, reacciones, likes en comentarios
+- Comentarios (crear, ver, responder, denunciar)
+- Navegación entre pantallas (tabs con componente `Icono`)
+- Socket.IO cuando el entorno lo permite (backend local con `server.ts`)
+- Consumo de la API REST
+- Notificaciones in-app y perfil de usuario
 
 ### Lo que `mobile/` NUNCA debe hacer
-❌ Ejecutar cron jobs
-❌ Conectarse directamente a MySQL
-❌ Ejecutar lógica de IA o llamar a DeepSeek API
-❌ Contener lógica de negocio del servidor
-❌ Ejecutar servidores Node.js
-❌ Manejar autenticación del lado del servidor
+- Ejecutar cron jobs ni llamar a DeepSeek
+- Conectarse directamente a MySQL
+- Contener lógica de negocio del servidor ni validar JWT
+- Usar emojis como iconografía de interfaz (usar `Icono` / Ionicons)
 
 ---
 
@@ -105,41 +107,43 @@ backend/
 - helmet + cors + express-rate-limit
 
 ### Responsabilidades de `backend/`
-✅ Autenticación JWT (registro, login, verificación)
-✅ API REST para todas las entidades
-✅ Manejo de MySQL (queries, pool de conexiones)
-✅ WebSockets (emitir eventos a clientes conectados)
-✅ Cron jobs (generación automática de publicaciones)
-✅ Integración con DeepSeek API
-✅ Validación de inputs
-✅ Seguridad (helmet, cors, rate limiting)
-✅ Logs de operaciones y errores
-✅ Manejo centralizado de errores
+- Autenticación JWT, API REST, MySQL (`shared/database/pool.ts`, `MYSQL_URL`)
+- WebSockets con `server.ts` (no en handler serverless de Vercel)
+- Generación IA: 4 publicaciones por ciclo (`orquestadorGeneracionIA.servicio.ts`)
+- Cron horario (`cronGenerador.ts`) y ruta `GET /api/cron/generar-ia` (Vercel Cron)
+- Semilla post-deploy: primera petición tras deploy en producción (`middlewareSemillaDespliegue`)
+- Moderación, denuncias, reacciones, likes; migraciones (`npm run migrar`)
 
 ### Lo que `backend/` NUNCA debe hacer
-❌ Renderizar UI
-❌ Importar librerías de React Native
-❌ Manejar navegación
-❌ Almacenar estado de UI
+- Renderizar UI ni importar React Native
+- Almacenar estado de UI
 
 ---
 
 ## Flujo general del sistema
 
-```
-[Cron Job — cada hora]
-    └── backend/src/infrastructure/cron/cronGenerador.ts
-          └── Orquestador de pipeline (ver `.kiro/specs/pipeline-generacion-ia/`)
-          └── Consulta DeepSeek API
-          └── Valida y guarda publicación en MySQL
-          └── Socket.IO emite 'nuevas_publicaciones' a todos los clientes
+### Generación de publicaciones IA
 
-[Cliente móvil]
-    └── mobile/src/hooks/usePublicacionesNuevas.ts
-          └── Recibe evento 'nuevas_publicaciones'
-          └── Muestra BannerNuevasPublicaciones
-          └── Usuario toca → recarga el feed
+| Entorno | Al desplegar / arrancar | Cada hora |
+|---------|-------------------------|-----------|
+| **Local** (`npm run dev` en backend) | 4 posts al iniciar `server.ts` | Cron `0 * * * *` → 4 posts |
+| **Vercel** (producción) | 4 posts en la primera petición al API del nuevo deployment | Vercel Cron → `GET /api/cron/generar-ia` → 4 posts |
+
+Pipeline: `cronGenerador.ts` → `ejecutarCicloOrquestadorGeneracionIA` → DeepSeek → `procesarLotePublicacionesIA` → MySQL. Detalle en `.kiro/specs/pipeline-generacion-ia/`.
+
+### Tiempo real (solo con `server.ts`)
+
 ```
+Socket.IO emite 'nuevas_publicaciones' → mobile/usePublicacionesNuevas → BannerNuevasPublicaciones
+```
+
+En **Vercel** y **Expo Web** contra `*.vercel.app` el cliente **no** conecta Socket (`socketDisponibleEnEntorno`); el feed se actualiza por pull (recargar / paginación).
+
+### Deploy Vercel
+
+- Build: `scripts/vercel-build.cjs` (backend `tsc` + `expo export --platform web`)
+- Runtime API: `api/index.ts` exporta `crearAplicacion()` sin cron ni Socket.IO
+- Guía: `docs/DEPLOY-VERCEL.md`
 
 ---
 

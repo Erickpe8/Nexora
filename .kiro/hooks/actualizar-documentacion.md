@@ -21,15 +21,18 @@ Recordar al desarrollador que debe actualizar la documentación relevante cada v
 - ¿Cambió el stack tecnológico? Actualizar `stack.md`
 - ¿Cambió el flujo de trabajo? Actualizar `flujo-trabajo.md`
 
-### README
+### README y docs/
 - ¿Los endpoints nuevos están documentados?
 - ¿Las variables de entorno nuevas están listadas?
+- ¿`docs/DEPLOY-VERCEL.md` o `docs/arquitectura.md` reflejan deploy y cron?
+- ¿`.kiro/README.md` y `docs/README.md` siguen siendo índices válidos?
 
 ## Checklist rápido
-- [ ] Spec del módulo actualizada
-- [ ] Tasks marcadas como completadas
-- [ ] README del backend actualizado si aplica
-- [ ] Steering actualizado si se introdujo algo nuevo
+- [ ] Spec del módulo actualizada (`requirements.md`, `design.md`)
+- [ ] Tasks alineadas o nota de “implementado en código”
+- [ ] README raíz y `docs/` si cambió operación o arquitectura
+- [ ] Steering (`arquitectura-monorepo`, `stack`, `convenciones`) si hay convención nueva
+- [ ] Sin emojis en documentación de producto salvo ejemplos explícitos de “no usar”
 
 ## Regla
 Ningún commit debe incluir código nuevo sin la documentación correspondiente actualizada.

@@ -1,5 +1,7 @@
 # Tareas de Implementación — UI Global
 
+> El sistema de diseño y `Icono.tsx` están en `mobile/src/components/` y `mobile/src/styles/`. Checklist histórico — ver `design.md`.
+
 ## Sistema de tokens
 
 - [ ] Crear `src/styles/colores.ts` con toda la paleta de colores del tema oscuro
@@ -34,7 +36,7 @@
   - [ ] Animación de pulso con `Animated`
   - [ ] Layout que imita `TarjetaPublicacion`
 - [ ] Crear componente `EstadoVacio` en `src/components/`
-  - [ ] Ícono opcional
+  - [ ] Ícono opcional (`Icono`, no emoji)
   - [ ] Mensaje principal y secundario
 - [ ] Crear componente `Divisor` en `src/components/`
   - [ ] Línea horizontal con color `borde`
@@ -42,6 +44,9 @@
 - [ ] Crear componente `Insignia` en `src/components/`
   - [ ] Variantes: acento, exito, error, info
   - [ ] Texto corto (máx. 20 caracteres)
+- [x] Crear componente `Icono` en `src/components/Icono.tsx`
+  - [x] Ionicons outline; nombres semánticos; `iconoPorReaccion`
+  - [x] Sin emojis en UI de producto
 
 ## Layout y estructura
 

@@ -3,7 +3,7 @@ import { View, TextInput, TouchableOpacity } from 'react-native'
 import { colores } from '../styles/colores'
 import { tipografia } from '../styles/tipografia'
 import { espaciado } from '../styles/espaciado'
-import Texto from './Texto'
+import Icono from './Icono'
 
 interface PropsBarraBusqueda {
   valor: string
@@ -56,16 +56,12 @@ const BarraBusqueda = ({
         marginBottom: espaciado.sm,
       }}
     >
-      {/* Ícono lupa */}
-      <Texto
-        style={{
-          fontSize: tipografia.tamanos.base,
-          marginRight: espaciado.sm,
-          color: colores.textoSecundario,
-        }}
-      >
-        🔍
-      </Texto>
+      <Icono
+        nombre="buscar"
+        tamano={18}
+        color={colores.textoSecundario}
+        style={{ marginRight: espaciado.sm }}
+      />
 
       <TextInput
         ref={inputRef}
@@ -84,23 +80,24 @@ const BarraBusqueda = ({
       />
 
       {texto.length > 0 ? (
-        <TouchableOpacity onPress={alLimpiar} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
-          <Texto
-            style={{
-              fontSize: tipografia.tamanos.base,
-              color: colores.textoSecundario,
-              marginLeft: espaciado.sm,
-            }}
-          >
-            ✕
-          </Texto>
+        <TouchableOpacity
+          onPress={alLimpiar}
+          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+          accessibilityRole="button"
+          accessibilityLabel="Limpiar búsqueda"
+        >
+          <Icono
+            nombre="cerrar"
+            tamano={20}
+            color={colores.textoSecundario}
+            style={{ marginLeft: espaciado.sm }}
+          />
         </TouchableOpacity>
       ) : null}
     </View>
   )
 }
 
-// layout local para no importar todo el módulo
 const layout = {
   radiosBorde: { sm: 6, md: 10, lg: 16, xl: 24 },
 }

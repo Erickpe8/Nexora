@@ -78,6 +78,13 @@ const main = () => {
     env: envTablas,
   })
 
+  console.log('\n🔧 Migraciones (reacciones, likes, estado_sistema…)…')
+  execSync('npm run migrar', {
+    cwd: path.join(root, 'backend'),
+    stdio: 'inherit',
+    env: envTablas,
+  })
+
   const login = ejecutarVercel(['whoami'])
   if (login.status !== 0) {
     console.error('\n⚠️  Falta login en Vercel. En esta terminal ejecuta:')
@@ -90,6 +97,9 @@ const main = () => {
   console.log('\n📤 Subiendo variables a Vercel…')
   execSync('node scripts/vercel-env-push.cjs', { cwd: root, stdio: 'inherit' })
   console.log('\n✅ Listo. En vercel.com → Deployments → Redeploy')
+  console.log('   Tras el redeploy: 4 posts al primer acceso al sitio (semilla automática).')
+  console.log('   Luego: cron cada hora en punto (4 posts por ciclo).')
+  console.log('   Opcional manual: npm run vercel:sembrar-feed (requiere CRON_SECRET en .env.vercel)')
   console.log('   Prueba: https://nexora-ruddy-nine.vercel.app/api/salud\n')
 }
 

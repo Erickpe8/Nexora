@@ -1,30 +1,50 @@
 import React from 'react'
 import { View } from 'react-native'
+import AvatarPerfil from './AvatarPerfil'
 import Texto from './Texto'
+import { colores } from '../styles/colores'
 
 interface PropsCabeceraPerfil {
   nombre: string
   creadoEn: string
+  fotoPerfilUrl?: string | null
+  biografia?: string | null
+  fechaNacimiento?: string | null
 }
 
-const obtenerIniciales = (nombre: string): string =>
-  nombre
-    .split(' ')
-    .filter(Boolean)
-    .slice(0, 2)
-    .map(parte => parte[0]?.toUpperCase() ?? '')
-    .join('')
+const formatearFecha = (iso: string): string =>
+  new Date(iso.includes('T') ? iso : `${iso}T12:00:00`).toLocaleDateString('es', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  })
 
-const CabeceraPerfil = ({ nombre, creadoEn }: PropsCabeceraPerfil) => {
+const CabeceraPerfil = ({
+  nombre,
+  creadoEn,
+  fotoPerfilUrl,
+  biografia,
+  fechaNacimiento,
+}: PropsCabeceraPerfil) => {
   return (
     <View className="items-center">
-      <View className="mb-2 h-16 w-16 items-center justify-center rounded-full bg-acento">
-        <Texto variante="subtitulo" color="#F0F0F0">
-          {obtenerIniciales(nombre)}
+      <AvatarPerfil nombre={nombre} fotoPerfilUrl={fotoPerfilUrl} tamano={96} />
+      <Texto variante="subtitulo" className="mt-3 text-center">
+        {nombre}
+      </Texto>
+      <Texto variante="caption" className="mt-1">
+        Miembro desde {formatearFecha(creadoEn)}
+      </Texto>
+      {fechaNacimiento ? (
+        <Texto variante="caption" color={colores.textoSecundario} className="mt-1">
+          Nacimiento: {formatearFecha(fechaNacimiento)}
         </Texto>
-      </View>
-      <Texto variante="subtitulo">{nombre}</Texto>
-      <Texto variante="caption">Miembro desde {new Date(creadoEn).toLocaleDateString()}</Texto>
+      ) : null}
+      {biografia?.trim() ? (
+        <Texto variante="cuerpo" className="mt-3 text-center leading-5">
+          {biografia.trim()}
+        </Texto>
+      ) : null}
     </View>
   )
 }

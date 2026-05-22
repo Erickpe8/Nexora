@@ -64,7 +64,7 @@ const Boton = ({
     >
       {cargando ? (
         <ActivityIndicator size="small" color="#F0F0F0" />
-      ) : (
+      ) : typeof children === 'string' || typeof children === 'number' ? (
         <Texto
           variante={tamanoTexto[tamano]}
           color={variante === 'fantasma' ? '#6C63FF' : '#F0F0F0'}
@@ -72,6 +72,8 @@ const Boton = ({
         >
           {children}
         </Texto>
+      ) : (
+        children
       )}
     </TouchableOpacity>
   )

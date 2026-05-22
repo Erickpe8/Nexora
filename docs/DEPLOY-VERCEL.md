@@ -62,4 +62,16 @@ Luego en [vercel.com](https://vercel.com) → **Redeploy**.
 - https://nexora-ruddy-nine.vercel.app/api/salud → `"mysql": "ok"`
 - https://nexora-ruddy-nine.vercel.app/ → login / registro
 
-**Nota:** Socket.IO y el cron de posts por hora **no** corren en Vercel; solo con `npm run dev` en `backend/`.
+## Generación de posts (IA)
+
+| Momento | Qué pasa |
+|---------|----------|
+| **Tras cada deploy** (producción) | Primera visita al sitio o al API → **4 publicaciones** (semilla automática) |
+| **Cada hora en punto** | Vercel Cron → `GET /api/cron/generar-ia` → **4 publicaciones** más |
+| **Local** (`npm run dev` en backend) | Al arrancar → 4 posts; luego cada hora |
+
+Variables necesarias en Vercel: `DEEPSEEK_API_KEY`, `MYSQL_URL`, `DB_SSL=true`, `CRON_SECRET` (aleatorio largo).
+
+Manual tras redeploy: `npm run vercel:sembrar-feed`
+
+**Nota:** Socket.IO en tiempo real sigue sin funcionar en Vercel (solo API REST).

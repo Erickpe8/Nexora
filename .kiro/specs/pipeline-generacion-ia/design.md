@@ -29,7 +29,11 @@ sequenceDiagram
 
 ## Estado actual (código)
 
-Hoy: `cronGenerador.ts` orquesta de facto y llama `procesarLotePublicacionesIA`; emite `nuevas_publicaciones` tras resultado. La extracción a `orquestadorGeneracionIA.servicio.ts` es refactor mecánico + invariantes de orden.
+- Orquestador: `backend/src/services/orquestadorGeneracionIA.servicio.ts` (4 items por ciclo).
+- Cron local: `cronGenerador.ts` — al arrancar `server.ts` ejecuta un ciclo; luego `0 * * * *`.
+- Vercel: `GET /api/cron/generar-ia` (header `x-vercel-cron` o `Authorization: Bearer CRON_SECRET`); definido en `vercel.json` → `crons`.
+- Semilla deploy: `middlewareSemillaDespliegue` — primer request con `VERCEL_DEPLOYMENT_ID` nuevo → un ciclo; marca en tabla `estado_sistema`.
+- Emisión socket: solo si hay inserts y corre `server.ts` con Socket.IO activo.
 
 ## Puntos de extensión
 

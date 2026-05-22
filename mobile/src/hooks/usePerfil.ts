@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react'
-import type { PerfilUsuario } from '../types'
+import type { ActualizarPerfil, PerfilUsuario } from '../types'
 import { servicioPerfil } from '../services/servicioPerfil'
 
 export const usePerfil = (token: string | null) => {
@@ -21,15 +21,15 @@ export const usePerfil = (token: string | null) => {
     }
   }, [token])
 
-  const actualizarNombre = useCallback(
-    async (nombre: string) => {
+  const actualizarPerfil = useCallback(
+    async (datos: ActualizarPerfil) => {
       if (!token) return
       setGuardando(true)
       setError(null)
       try {
-        setPerfil(await servicioPerfil.actualizarNombre(token, nombre))
+        setPerfil(await servicioPerfil.actualizarPerfil(token, datos))
       } catch {
-        setError('No se pudo actualizar el nombre')
+        setError('No se pudo guardar el perfil. Revisa los datos e intenta de nuevo.')
         throw new Error('error_actualizar_perfil')
       } finally {
         setGuardando(false)
@@ -38,5 +38,10 @@ export const usePerfil = (token: string | null) => {
     [token]
   )
 
-  return { perfil, cargando, guardando, error, cargar, actualizarNombre }
+  const actualizarNombre = useCallback(
+    async (nombre: string) => actualizarPerfil({ nombre }),
+    [actualizarPerfil]
+  )
+
+  return { perfil, cargando, guardando, error, cargar, actualizarPerfil, actualizarNombre }
 }

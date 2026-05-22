@@ -4,6 +4,8 @@ import cors from 'cors'
 import { limitadorGeneral } from './middlewares/rateLimiting'
 import { middlewareErrores, middlewareNoEncontrado } from './middlewares/errores'
 import { middlewareCorrelacion } from './middlewares/correlacion'
+import { middlewareSemillaDespliegue } from './middlewares/semillaDespliegue'
+import rutasCron from './routes/cron.rutas'
 import rutasAuth from './routes/auth.rutas'
 import rutasPublicaciones from './routes/publicaciones.rutas'
 import rutasComentarios from './routes/comentarios.rutas'
@@ -25,7 +27,9 @@ export const crearAplicacion = (): Express => {
   app.use(express.json())
   app.use(express.urlencoded({ extended: true }))
   app.use(middlewareCorrelacion)
+  app.use(middlewareSemillaDespliegue)
   app.use('/api/salud', rutasSalud)
+  app.use('/api/cron', rutasCron)
   app.use(limitadorGeneral)
 
   app.get('/', (_req, res) => {
