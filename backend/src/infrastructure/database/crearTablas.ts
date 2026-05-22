@@ -170,23 +170,18 @@ const tablas = [
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`,
 ]
 
-const crearTablas = async (): Promise<void> => {
+export const crearTodasLasTablas = async (opciones?: { log?: boolean }): Promise<void> => {
+  const log = opciones?.log ?? true
   await verificarConexion()
 
-  console.log('🔧 Creando tablas...')
+  if (log) console.log('🔧 Creando tablas...')
 
   for (const sql of tablas) {
-    try {
-      await pool.execute(sql)
-      const nombre = sql.match(/CREATE TABLE IF NOT EXISTS (\w+)/)?.[1]
-      console.log(`  ✅ Tabla '${nombre}' lista`)
-    } catch (error) {
-      console.error('  ❌ Error al crear tabla:', error)
-      process.exit(1)
-    }
+    await pool.execute(sql)
+    const nombre = sql.match(/CREATE TABLE IF NOT EXISTS (\w+)/)?.[1]
+    if (log) console.log(`  ✅ Tabla '${nombre}' lista`)
   }
 
-  // Semilla: versión inicial del prompt de DeepSeek
   try {
     await pool.execute(
       `INSERT IGNORE INTO versiones_prompt_ia (nombre, version, plantilla, activo) VALUES (?, ?, ?, ?)`,
@@ -197,13 +192,21 @@ const crearTablas = async (): Promise<void> => {
         true,
       ]
     )
-    console.log(`  ✅ Semilla 'versiones_prompt_ia' lista`)
+    if (log) console.log(`  ✅ Semilla 'versiones_prompt_ia' lista`)
   } catch (error) {
-    console.warn('  ⚠️  Semilla versiones_prompt_ia ya existe o falló:', (error as Error).message)
+    if (log) console.warn('  ⚠️  Semilla versiones_prompt_ia:', (error as Error).message)
   }
 
-  console.log('✅ Todas las tablas creadas correctamente')
-  process.exit(0)
+  if (log) console.log('✅ Todas las tablas creadas correctamente')
 }
 
-void crearTablas()
+const esCli = require.main === module || process.argv[1]?.includes('crearTablas')
+
+if (esCli) {
+  void crearTodasLasTablas({ log: true })
+    .then(() => process.exit(0))
+    .catch(err => {
+      console.error('❌ crearTablas:', err)
+      process.exit(1)
+    })
+}

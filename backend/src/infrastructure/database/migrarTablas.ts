@@ -1,10 +1,8 @@
 /**
- * Script de migración incremental.
- * Agrega columnas y tablas nuevas a una base de datos ya existente sin borrar datos.
- * Seguro para ejecutar múltiples veces (idempotente).
- *
- * Uso: npm run migrar
+ * Migración incremental (columnas/tablas nuevas). Idempotente.
+ * Uso directo: npm run migrar  → sincronizarEsquema.ts
  */
+export const ESQUEMA_VERSION = '2026.05.22.1'
 import { pool, verificarConexion } from '../../shared/database/pool'
 import { generarSlugDesdeTitulo } from '../../utils/slug'
 import { generarUsernameDisponible } from '../../utils/username'
@@ -182,23 +180,25 @@ const migraciones: MigracionSQL[] = [
   },
 ]
 
-const migrarTablas = async (): Promise<void> => {
+export const ejecutarMigracionesIncremental = async (opciones?: {
+  log?: boolean
+}): Promise<void> => {
+  const log = opciones?.log ?? true
   await verificarConexion()
-  console.log('🔧 Ejecutando migraciones incrementales...\n')
+  if (log) console.log('🔧 Ejecutando migraciones incrementales...\n')
 
-  // 1. Ejecutar migraciones de tablas nuevas
   for (const migracion of migraciones) {
     try {
       await pool.execute(migracion.sql)
-      console.log(`  ✅ ${migracion.descripcion}`)
+      if (log) console.log(`  ✅ ${migracion.descripcion}`)
     } catch (error) {
-      console.error(`  ❌ ${migracion.descripcion}:`, (error as Error).message)
-      process.exit(1)
+      const msg = (error as Error).message
+      if (log) console.error(`  ❌ ${migracion.descripcion}:`, msg)
+      throw new Error(`${migracion.descripcion}: ${msg}`)
     }
   }
 
-  // 2. Agregar columnas nuevas a tablas existentes
-  console.log('\n🔧 Agregando columnas nuevas a tablas existentes...\n')
+  if (log) console.log('\n🔧 Agregando columnas nuevas a tablas existentes...\n')
 
   await agregarColumnasSiNoExisten('publicaciones', [
     { nombre: 'compartidos_count',    definicion: 'compartidos_count INT NOT NULL DEFAULT 0 AFTER relevancia' },
@@ -299,8 +299,5 @@ const migrarTablas = async (): Promise<void> => {
     console.log('  ⏭  Semilla versiones_prompt_ia ya existe — omitida')
   }
 
-  console.log('\n✅ Todas las migraciones completadas correctamente')
-  process.exit(0)
+  if (log) console.log('\n✅ Todas las migraciones incrementales completadas')
 }
-
-void migrarTablas()

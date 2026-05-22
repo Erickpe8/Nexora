@@ -50,7 +50,12 @@ export const mapearErrorAuth = (error: unknown): string => {
   }
 
   const delServidor = textoDesdeCuerpo(error.response?.data as CuerpoErrorApi)
-  if (delServidor) return delServidor
+  if (delServidor) {
+    if (error.response?.status === 503) {
+      return 'El servidor está actualizando la base de datos. Espera unos segundos e inténtalo de nuevo.'
+    }
+    return delServidor
+  }
 
   if (!error.response) {
     if (origenWebLocalPeroApiPorIpLan()) {

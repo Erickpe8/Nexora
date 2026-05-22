@@ -47,15 +47,9 @@ npm run vercel:finalizar
 
 Eso: crea tablas en Railway, actualiza `.env.vercel` y sube variables a Vercel.
 
-Si ya tenías la BD creada y actualizaste el código (reacciones, likes, denuncias), ejecuta también:
+**Migraciones automáticas:** en cada deploy, el build de Vercel y el primer request al API ejecutan `sincronizarEsquema` (tablas + columnas como `username`). No hace falta `npm run migrar` manual salvo depuración (`npm run migrar:railway`).
 
-```bash
-# Con db.remote.env (MYSQL_URL + DB_SSL=true)
-set -a && source db.remote.env && set +a
-npm run migrar --prefix backend
-```
-
-Luego en [vercel.com](https://vercel.com) → **Redeploy**.
+Luego en [vercel.com](https://vercel.com) → **Redeploy** (o push a `main` si el repo está enlazado).
 
 ## Comprobar
 

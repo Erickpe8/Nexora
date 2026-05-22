@@ -81,7 +81,7 @@ export const middlewareErrores = (
     registro.error('HTTP', error, { ruta: req.path, metodo: req.method, status: 503 })
     res.status(503).json({
       error:
-        'Base de datos desactualizada (falta columna o tabla). Ejecuta en Railway: npm run migrar --prefix backend',
+        'La base de datos se está actualizando. Espera unos segundos y vuelve a intentar.',
       codigo: 503,
     })
     return

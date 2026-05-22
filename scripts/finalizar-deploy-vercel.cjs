@@ -69,16 +69,9 @@ const main = () => {
   fs.writeFileSync(envVercel, vercelEnv, 'utf8')
   console.log('✅ .env.vercel actualizado con MYSQL_URL')
 
-  console.log('\n🔧 Creando tablas en MySQL remoto…')
+  console.log('\n🗄️  Sincronizando esquema MySQL (tablas + migraciones)…')
   const envTablas = { ...process.env, MYSQL_URL: mysqlUrl, NODE_ENV: 'production' }
   if (remoto.get('DB_SSL')) envTablas.DB_SSL = remoto.get('DB_SSL')
-  execSync('npm run tablas', {
-    cwd: path.join(root, 'backend'),
-    stdio: 'inherit',
-    env: envTablas,
-  })
-
-  console.log('\n🔧 Migraciones (reacciones, likes, estado_sistema…)…')
   execSync('npm run migrar', {
     cwd: path.join(root, 'backend'),
     stdio: 'inherit',

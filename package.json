@@ -8,6 +8,7 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "tablas": "npm run tablas --prefix backend",
+    "migrar:railway": "node scripts/migrar-railway.cjs",
     "vercel-install": "npm install --include=dev --prefix backend && npm install --include=dev --prefix mobile",
     "vercel-build": "node scripts/vercel-build.cjs",
     "vercel:prepare": "node scripts/prepare-vercel-env.cjs",

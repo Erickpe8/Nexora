@@ -27,6 +27,11 @@ try {
     stdio: 'inherit',
     env: { ...process.env, NODE_ENV: 'development' },
   })
+  execSync('node scripts/migrar-en-build.cjs', {
+    cwd: root,
+    stdio: 'inherit',
+    env: process.env,
+  })
   console.log('\n📦 serverless: bundle API para Vercel …')
   execSync('node scripts/bundle-serverless.cjs', {
     cwd: root,

@@ -8,7 +8,7 @@
     "build": "npx tsc",
     "start": "node dist/server.js",
     "tablas": "ts-node src/infrastructure/database/crearTablas.ts",
-    "migrar": "ts-node src/infrastructure/database/migrarTablas.ts"
+    "migrar": "ts-node src/infrastructure/database/sincronizarEsquema.ts"
   },
   "dependencies": {
     "@types/bcryptjs": "^2.4.6",
