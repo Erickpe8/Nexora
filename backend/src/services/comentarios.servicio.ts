@@ -1,5 +1,6 @@
 import type { ResultSetHeader, RowDataPacket } from 'mysql2/promise'
 import { pool } from '../shared/database/pool'
+import { columnaExiste, tablaExiste } from '../shared/database/esquema'
 import { io } from '../infrastructure/sockets/socket'
 import { ErrorHttp } from '../shared/errors/errorHttp'
 import { crearNotificacion } from './notificaciones.servicio'
@@ -19,6 +20,28 @@ interface ComentarioFila extends RowDataPacket {
   me_dio_like: number
 }
 
+const selectComentarios = async (): Promise<{
+  sql: string
+  incluyeUsuarioEnParams: boolean
+}> => {
+  const conLikes = await tablaExiste('likes_comentario')
+  const conModeracion = await columnaExiste('comentarios', 'estado_moderacion')
+  const estadoModeracion = conModeracion ? 'c.estado_moderacion' : "'visible' AS estado_moderacion"
+  const camposLikes = conLikes
+    ? `(SELECT COUNT(*) FROM likes_comentario l WHERE l.comentario_id = c.id) AS total_likes,
+       (SELECT COUNT(*) FROM likes_comentario l2 WHERE l2.comentario_id = c.id AND l2.usuario_id = ?) AS me_dio_like`
+    : '0 AS total_likes, 0 AS me_dio_like'
+
+  return {
+    incluyeUsuarioEnParams: conLikes,
+    sql: `SELECT c.id, c.publicacion_id, c.usuario_id, u.nombre AS nombre_usuario,
+            c.comentario_padre_id, c.contenido, c.eliminado, ${estadoModeracion}, c.creado_en,
+            ${camposLikes}
+     FROM comentarios c
+     INNER JOIN usuarios u ON u.id = c.usuario_id`,
+  }
+}
+
 const mapearComentario = (fila: ComentarioFila): Comentario => ({
   id: fila.id,
   publicacionId: fila.publicacion_id,
@@ -35,31 +58,21 @@ const mapearComentario = (fila: ComentarioFila): Comentario => ({
 })
 
 const obtenerComentarioPorId = async (comentarioId: number, usuarioId = 0): Promise<ComentarioFila | null> => {
+  const base = await selectComentarios()
+  const params = base.incluyeUsuarioEnParams ? [usuarioId, comentarioId] : [comentarioId]
   const [filas] = await pool.execute<ComentarioFila[]>(
-    `SELECT c.id, c.publicacion_id, c.usuario_id, u.nombre AS nombre_usuario,
-            c.comentario_padre_id, c.contenido, c.eliminado, c.estado_moderacion, c.creado_en,
-            (SELECT COUNT(*) FROM likes_comentario l WHERE l.comentario_id = c.id) AS total_likes,
-            (SELECT COUNT(*) FROM likes_comentario l2 WHERE l2.comentario_id = c.id AND l2.usuario_id = ?) AS me_dio_like
-     FROM comentarios c
-     INNER JOIN usuarios u ON u.id = c.usuario_id
-     WHERE c.id = ?
-     LIMIT 1`,
-    [usuarioId, comentarioId]
+    `${base.sql} WHERE c.id = ? LIMIT 1`,
+    params
   )
   return filas[0] ?? null
 }
 
 export const obtenerComentariosPublicacion = async (publicacionId: number, usuarioId = 0): Promise<Comentario[]> => {
+  const base = await selectComentarios()
+  const params = base.incluyeUsuarioEnParams ? [usuarioId, publicacionId] : [publicacionId]
   const [filas] = await pool.execute<ComentarioFila[]>(
-    `SELECT c.id, c.publicacion_id, c.usuario_id, u.nombre AS nombre_usuario,
-            c.comentario_padre_id, c.contenido, c.eliminado, c.estado_moderacion, c.creado_en,
-            (SELECT COUNT(*) FROM likes_comentario l WHERE l.comentario_id = c.id) AS total_likes,
-            (SELECT COUNT(*) FROM likes_comentario l2 WHERE l2.comentario_id = c.id AND l2.usuario_id = ?) AS me_dio_like
-     FROM comentarios c
-     INNER JOIN usuarios u ON u.id = c.usuario_id
-     WHERE c.publicacion_id = ?
-     ORDER BY c.creado_en ASC`,
-    [usuarioId, publicacionId]
+    `${base.sql} WHERE c.publicacion_id = ? ORDER BY c.creado_en ASC`,
+    params
   )
 
   const comentariosRaiz: Comentario[] = []

@@ -1,5 +1,6 @@
 import { io, Socket } from 'socket.io-client'
 import { urlBaseApi } from './api'
+import { socketDisponibleEnEntorno } from '../utils/socketDisponible'
 
 let socketInstancia: Socket | null = null
 
@@ -8,7 +9,10 @@ const obtenerUrlSocket = (): string => {
 }
 
 export const servicioSocket = {
-  conectar(token: string): Socket {
+  conectar(token: string): Socket | null {
+    if (!socketDisponibleEnEntorno()) {
+      return null
+    }
     if (socketInstancia?.connected) {
       return socketInstancia
     }

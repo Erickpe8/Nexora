@@ -1,5 +1,7 @@
 import React, { useEffect, useRef } from 'react'
-import { View, Animated } from 'react-native'
+import { View, Animated, Platform } from 'react-native'
+
+const usarDriverNativo = Platform.OS !== 'web'
 
 // Skeleton animado que imita el layout de TarjetaPublicacion
 const EsqueletoTarjeta = () => {
@@ -12,12 +14,12 @@ const EsqueletoTarjeta = () => {
         Animated.timing(opacidad, {
           toValue: 1,
           duration: 800,
-          useNativeDriver: true,
+          useNativeDriver: usarDriverNativo,
         }),
         Animated.timing(opacidad, {
           toValue: 0.3,
           duration: 800,
-          useNativeDriver: true,
+          useNativeDriver: usarDriverNativo,
         }),
       ])
     )

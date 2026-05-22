@@ -47,9 +47,19 @@ npm run vercel:finalizar
 
 Eso: crea tablas en Railway, actualiza `.env.vercel` y sube variables a Vercel.
 
+Si ya tenías la BD creada y actualizaste el código (reacciones, likes, denuncias), ejecuta también:
+
+```bash
+# Con db.remote.env (MYSQL_URL + DB_SSL=true)
+set -a && source db.remote.env && set +a
+npm run migrar --prefix backend
+```
+
 Luego en [vercel.com](https://vercel.com) → **Redeploy**.
 
 ## Comprobar
 
 - https://nexora-ruddy-nine.vercel.app/api/salud → `"mysql": "ok"`
 - https://nexora-ruddy-nine.vercel.app/ → login / registro
+
+**Nota:** Socket.IO y el cron de posts por hora **no** corren en Vercel; solo con `npm run dev` en `backend/`.

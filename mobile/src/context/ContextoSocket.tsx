@@ -29,6 +29,12 @@ export const ProveedorSocket = ({ children }: { children: React.ReactNode }) => 
     }
 
     const instancia = servicioSocket.conectar(token)
+    if (!instancia) {
+      setSocket(null)
+      setEstadoConexion('desconectado')
+      return
+    }
+
     setSocket(instancia)
 
     const alConectar = () => setEstadoConexion('conectado')

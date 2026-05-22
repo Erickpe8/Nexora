@@ -1,5 +1,6 @@
 import type { RowDataPacket } from 'mysql2/promise'
 import { pool } from '../shared/database/pool'
+import { tablaExiste } from '../shared/database/esquema'
 import { ErrorHttp } from '../shared/errors/errorHttp'
 import type { Publicacion, RespuestaFeed } from '../types'
 
@@ -65,17 +66,24 @@ export const obtenerFeedPaginado = async (
   const total = Number(conteo[0]?.total ?? 0)
   const totalPaginas = Math.max(1, Math.ceil(total / limiteNormalizado))
 
+  const conReacciones = await tablaExiste('reacciones_publicacion')
+  const camposReacciones = conReacciones
+    ? `(SELECT COUNT(*) FROM reacciones_publicacion r WHERE r.publicacion_id = p.id) AS total_reacciones,
+       (SELECT r2.tipo FROM reacciones_publicacion r2 WHERE r2.publicacion_id = p.id AND r2.usuario_id = ? LIMIT 1) AS mi_reaccion`
+    : `0 AS total_reacciones, NULL AS mi_reaccion`
+
+  const paramsFeed = conReacciones ? [...whereParams, usuarioId] : whereParams
+
   const [filas] = await pool.query<PublicacionFila[]>(
     `SELECT
       p.id, p.titulo, p.resumen, p.pregunta, p.etiquetas, p.generado_por_ia, p.creado_en,
       (SELECT COUNT(*) FROM comentarios c WHERE c.publicacion_id = p.id) AS total_comentarios,
-      (SELECT COUNT(*) FROM reacciones_publicacion r WHERE r.publicacion_id = p.id) AS total_reacciones,
-      (SELECT r2.tipo FROM reacciones_publicacion r2 WHERE r2.publicacion_id = p.id AND r2.usuario_id = ${usuarioId} LIMIT 1) AS mi_reaccion
+      ${camposReacciones}
     FROM publicaciones p
     ${whereClause}
     ORDER BY p.creado_en DESC
     LIMIT ${limiteNormalizado} OFFSET ${offset}`,
-    whereParams
+    paramsFeed
   )
 
   return {
@@ -86,16 +94,23 @@ export const obtenerFeedPaginado = async (
 }
 
 export const obtenerPublicacionPorId = async (id: number, usuarioId: number): Promise<Publicacion> => {
+  const conReacciones = await tablaExiste('reacciones_publicacion')
+  const camposReacciones = conReacciones
+    ? `(SELECT COUNT(*) FROM reacciones_publicacion r WHERE r.publicacion_id = p.id) AS total_reacciones,
+       (SELECT r2.tipo FROM reacciones_publicacion r2 WHERE r2.publicacion_id = p.id AND r2.usuario_id = ? LIMIT 1) AS mi_reaccion`
+    : `0 AS total_reacciones, NULL AS mi_reaccion`
+
+  const paramsDetalle = conReacciones ? [usuarioId, id] : [id]
+
   const [filas] = await pool.execute<PublicacionFila[]>(
     `SELECT
       p.id, p.titulo, p.resumen, p.pregunta, p.etiquetas, p.generado_por_ia, p.creado_en,
       (SELECT COUNT(*) FROM comentarios c WHERE c.publicacion_id = p.id) AS total_comentarios,
-      (SELECT COUNT(*) FROM reacciones_publicacion r WHERE r.publicacion_id = p.id) AS total_reacciones,
-      (SELECT r2.tipo FROM reacciones_publicacion r2 WHERE r2.publicacion_id = p.id AND r2.usuario_id = ? LIMIT 1) AS mi_reaccion
+      ${camposReacciones}
     FROM publicaciones p
     WHERE p.id = ?
     LIMIT 1`,
-    [usuarioId, id]
+    paramsDetalle
   )
 
   if (filas.length === 0) {
