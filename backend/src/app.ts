@@ -49,13 +49,13 @@ export const crearAplicacion = (): Express => {
   app.use('/api/internal/cron', rutasCronInterno)
   /** Legacy: redirige mentalmente a /api/internal/cron/generate-news */
   app.use('/api/cron', rutasCron)
+  /** Auth antes del limitador general (solo usa limitadorAuth). */
+  app.use('/api/auth', rutasAuth)
   app.use(limitadorGeneral)
 
   app.get('/', (_req, res) => {
     res.json({ mensaje: 'Nexora API funcionando', version: '1.0.0' })
   })
-
-  app.use('/api/auth', rutasAuth)
   app.use('/api/publicaciones', rutasPublicaciones)
   app.use('/api/comentarios', rutasComentarios)
   app.use('/api/usuarios', rutasUsuarios)

@@ -1,4 +1,4 @@
-import bcrypt from 'bcrypt'
+import bcrypt from 'bcryptjs'
 import { pool } from '../shared/database/pool'
 import { generarToken } from '../utils/jwt'
 import { ErrorHttp } from '../shared/errors/errorHttp'

@@ -1,6 +1,6 @@
 /**
  * Empaqueta Express (backend/dist) en un solo CJS para la función Vercel.
- * bcrypt queda external (binario nativo); debe resolverse desde node_modules en la raíz.
+ * bcryptjs va incluido en el bundle (sin binarios nativos; fiable en Vercel).
  */
 const esbuild = require('esbuild')
 const path = require('node:path')
@@ -26,7 +26,6 @@ esbuild.buildSync({
   format: 'cjs',
   sourcemap: false,
   minify: false,
-  external: ['bcrypt'],
   logLevel: 'info',
 })
 

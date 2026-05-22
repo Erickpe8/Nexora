@@ -38,6 +38,23 @@ export const middlewareErrores = (
     return
   }
 
+  const codigoRateLimit =
+    typeof error === 'object' &&
+    error !== null &&
+    'name' in error &&
+    (error as { name?: string }).name === 'ValidationError' &&
+    'code' in error &&
+    String((error as { code?: string }).code).startsWith('ERR_ERL')
+
+  if (codigoRateLimit) {
+    registro.error('HTTP', error, { ruta: req.path, metodo: req.method, status: 503 })
+    res.status(503).json({
+      error: 'Límite de peticiones mal configurado en el servidor (proxy). Reintenta en unos minutos.',
+      codigo: 503,
+    })
+    return
+  }
+
   if (error instanceof ErrorHttp) {
     // Errores de dominio esperados — solo loguear si son 5xx
     if (error.codigo >= 500) {
@@ -46,6 +63,23 @@ export const middlewareErrores = (
     res.status(error.codigo).json({
       error: error.mensaje,
       codigo: error.codigo,
+    })
+    return
+  }
+
+  const msg = error.message ?? ''
+  const esEsquemaDesactualizado =
+    msg.includes('Unknown column') ||
+    msg.includes("doesn't exist") ||
+    (typeof (error as { code?: string }).code === 'string' &&
+      (error as { code: string }).code === 'ER_BAD_FIELD_ERROR')
+
+  if (esEsquemaDesactualizado) {
+    registro.error('HTTP', error, { ruta: req.path, metodo: req.method, status: 503 })
+    res.status(503).json({
+      error:
+        'Base de datos desactualizada (falta columna o tabla). Ejecuta en Railway: npm run migrar --prefix backend',
+      codigo: 503,
     })
     return
   }
