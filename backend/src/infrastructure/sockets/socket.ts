@@ -2,6 +2,7 @@ import { Server as ServidorHTTP } from 'http'
 import { Server as ServidorSocket, Socket } from 'socket.io'
 import { verificarToken } from '../../utils/jwt'
 import { registro } from '../../shared/logger/registro'
+import { esOrigenPermitido } from '../../middlewares/corsConfig'
 import type { UsuarioToken } from '../../types'
 
 const CONTEXTO = 'Socket'
@@ -12,8 +13,15 @@ let socketsConectados = 0
 export const inicializarSocket = (servidorHttp: ServidorHTTP): ServidorSocket => {
   io = new ServidorSocket(servidorHttp, {
     cors: {
-      origin: '*',
+      origin: (origin, callback) => {
+        if (!origin || esOrigenPermitido(origin)) {
+          callback(null, true)
+          return
+        }
+        callback(new Error('CORS no permitido'))
+      },
       methods: ['GET', 'POST'],
+      credentials: true,
     },
   })
 

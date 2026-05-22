@@ -17,7 +17,7 @@ rutasUsuarios.get('/perfil', controladorPerfilPropio)
 rutasUsuarios.get('/perfil/guardados', controladorFeedGuardados)
 rutasUsuarios.patch('/perfil', controladorActualizarPerfil)
 rutasUsuarios.post('/perfil/foto', (req, res, next) => {
-  middlewareSubidaAvatar(req, res, err => {
+  middlewareSubidaAvatar(req, res, (err: unknown) => {
     if (err) {
       next(err)
       return

@@ -9,38 +9,48 @@
 - [x] Tarjeta feed: categoría, leer más, tiempo relativo, insignia tendencia
 - [ ] Pantalla detalle: contenido expandido + fuente + relacionadas (stub)
 
-## Fase 2 — Guardados + Compartir (prioridad estratégica)
+## Fase 2 — Guardados + Compartir ✅
 
-> SPEC dedicado: `.kiro/specs/guardados-compartir/`
+> SPEC: `.kiro/specs/guardados-compartir/`
 
-- [ ] Tabla `publicaciones_guardadas` + API + pantalla Guardados
-- [ ] Compartir noticia (deep link + Web Share API + contador)
-- [ ] Compartir comentario (URL con ancla)
-- [ ] “Leer después” + feed de guardados
-- [ ] Analytics `compartidos_eventos`
-- [ ] Orden comentarios: recientes / populares (paralelo opcional)
-- [ ] Editar comentario (ventana 15 min) (paralelo opcional)
+- [x] Tabla `publicaciones_guardadas` + API + pantalla Guardados
+- [x] Compartir noticia + contador + analytics
+- [x] Compartir comentario (URL con ancla)
+- [x] “Leer después” + feed de guardados
+- [ ] Orden comentarios: recientes / populares (paralelo)
+- [ ] Editar comentario (ventana 15 min) (paralelo)
 
-## Fase 3 — Menciones + Hashtags
+## Fase 3 — Ranking inteligente (siguiente)
 
-> SPEC dedicado: `.kiro/specs/menciones-hashtags/`
+> SPEC: `.kiro/specs/ranking-inteligente/`
+
+- [ ] Score heurístico en `GET /api/publicaciones?orden=ranking`
+- [ ] Endpoint `/api/publicaciones/trending`
+- [ ] Cron/job refresco relevancia desde engagement
+- [ ] Mobile: tabs Para ti / Reciente / Tendencia
+- [ ] Insignia “Explota” por velocidad de debate
+
+## Fase 4 — Menciones + Hashtags
+
+> SPEC: `.kiro/specs/menciones-hashtags/`
 
 - [ ] Parser `@usuario` + notificación mención
 - [ ] Parser `#tema` + páginas por hashtag
 - [ ] Trending hashtags + búsqueda
 - [ ] Autocomplete al componer comentario
-- [ ] Tendencias / destacadas en feed
+
+## Fase 5 — Tendencias IA + recomendaciones
+
+- [ ] Tendencias / destacadas en feed (cron + UI)
 - [ ] Noticias relacionadas por etiquetas/categoría
+- [ ] Recomendaciones por guardados/compartidos
 
-## Fase 4 — Sistema social (followers)
+## Fase 6 — Sistema social (followers) — al final
 
-> SPEC dedicado: `.kiro/specs/sistema-social/`
+> SPEC: `.kiro/specs/sistema-social/`
 
-- [ ] Tabla `seguimientos` (usuario-usuario)
-- [ ] Tabla `temas_seguidos`
-- [ ] Feed “Siguiendo” / filtro por tema
-- [ ] Usuarios y temas sugeridos
-- [ ] Actividad de usuarios
+- [ ] Tabla `seguimientos` + temas seguidos
+- [ ] Feed “Siguiendo” solo con señales previas
 
 ## Fase 5 — IA avanzada
 

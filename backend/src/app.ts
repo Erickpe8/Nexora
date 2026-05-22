@@ -1,7 +1,7 @@
 import express, { type Express } from 'express'
 import path from 'path'
 import helmet from 'helmet'
-import cors from 'cors'
+import { middlewareCors, middlewarePreflightVercel } from './middlewares/corsConfig'
 import { limitadorGeneral } from './middlewares/rateLimiting'
 import { middlewareErrores, middlewareNoEncontrado } from './middlewares/errores'
 import { middlewareCorrelacion } from './middlewares/correlacion'
@@ -24,8 +24,14 @@ import rutasInterno from './routes/interno.rutas'
 export const crearAplicacion = (): Express => {
   const app = express()
 
-  app.use(helmet())
-  app.use(cors({ origin: '*' }))
+  app.use(middlewareCors)
+  app.options('*', middlewareCors)
+  app.use(middlewarePreflightVercel)
+  app.use(
+    helmet({
+      crossOriginResourcePolicy: { policy: 'cross-origin' },
+    })
+  )
   app.use(express.json())
   app.use(express.urlencoded({ extended: true }))
   app.use(middlewareCorrelacion)

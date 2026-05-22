@@ -404,18 +404,46 @@ Al terminar cada fase, marcar el estado como `[x] Completado` en este archivo.
 
 Retención, viralidad, señales para recomendaciones. Ver `tasks.md` del spec.
 
-### Fase 14 — Menciones + Hashtags
-**Spec:** `.kiro/specs/menciones-hashtags/`  
-**Rama:** `feature/14-menciones-hashtags`  
+### Orden estratégico (engagement → descubrimiento → grafo)
+
+1. Guardados + compartir — retención y señales ✅  
+2. **Ranking inteligente** — feed que aprende del debate  
+3. Menciones + hashtags — navegación orgánica  
+4. Tendencias IA — detección de explosión temática  
+5. Recomendaciones personalizadas — afinidad por guardados/shares  
+6. Followers — **solo cuando** haya contenido, hábitos y señales (evitar feeds vacíos)
+
+### Fase 14 — Ranking inteligente del feed
+**Spec:** `.kiro/specs/ranking-inteligente/`  
+**Rama:** `feature/14-ranking-inteligente`  
 **Estado:** `[ ] Pendiente`  
 **Dependencia:** Fase 13
 
-Conversaciones conectadas y descubrimiento tipo X.
+Score por relevancia, engagement, compartidos, guardados y decay temporal. Tabs Para ti / Reciente / Tendencia.
 
-### Fase 15 — Sistema social (followers / temas)
-**Spec:** `.kiro/specs/sistema-social/`  
-**Rama:** `feature/15-sistema-social`  
+### Fase 15 — Menciones + Hashtags
+**Spec:** `.kiro/specs/menciones-hashtags/`  
+**Rama:** `feature/15-menciones-hashtags`  
 **Estado:** `[ ] Pendiente`  
-**Dependencia:** Fases 13 y 14
+**Dependencia:** Fase 14
 
-Feed personalizado, seguir usuarios/temas, sugerencias.
+### Fase 16 — Tendencias IA + feed destacado
+**Spec:** `.kiro/specs/red-social-noticias-ia/` (tendencias) + cron `update-trends`  
+**Estado:** `[ ] Pendiente`  
+**Dependencia:** Fases 14–15
+
+Noticias que explotan, hashtags trending, cron de relevancia enriquecido.
+
+### Fase 17 — Recomendaciones personalizadas
+**Estado:** `[ ] Pendiente`  
+**Dependencia:** Fases 13–16
+
+Intereses inferidos desde guardados/compartidos; mezcla ranking global + afinidad usuario.
+
+### Fase 18 — Sistema social (followers / temas)
+**Spec:** `.kiro/specs/sistema-social/`  
+**Rama:** `feature/18-sistema-social`  
+**Estado:** `[ ] Pendiente`  
+**Dependencia:** Fases 13–17 en producción
+
+Grafo social cuando ya exista contenido constante y engagement real.

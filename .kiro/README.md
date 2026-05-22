@@ -36,9 +36,10 @@ Cada carpeta tiene `requirements.md`, `design.md` y `tasks.md`.
 | [observabilidad-plataforma](specs/observabilidad-plataforma/) | Logs, `/api/salud` |
 | [gestion-configuracion-secretos](specs/gestion-configuracion-secretos/) | `.env`, `MYSQL_URL`, Vercel |
 | [red-social-noticias-ia](specs/red-social-noticias-ia/) | Visión social X+Reddit+FB, solo IA publica, fases 1–6 |
-| [guardados-compartir](specs/guardados-compartir/) | Fase social 1: guardados, compartir, leer después, analytics |
-| [menciones-hashtags](specs/menciones-hashtags/) | Fase social 2: @usuario, #tema, trending, búsqueda |
-| [sistema-social](specs/sistema-social/) | Fase social 3: followers, temas, feed personalizado |
+| [guardados-compartir](specs/guardados-compartir/) | Fase 13: guardados, compartir, leer después, analytics |
+| [ranking-inteligente](specs/ranking-inteligente/) | Fase 14: feed por score, tendencia, “explota” |
+| [menciones-hashtags](specs/menciones-hashtags/) | Fase 15: @usuario, #tema, descubrimiento |
+| [sistema-social](specs/sistema-social/) | Fase 18: followers (después de señales y contenido) |
 
 ## Hooks (automatización)
 
