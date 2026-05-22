@@ -15,6 +15,7 @@ db.remote.env
 
 # --- Builds y caché ---
 backend/dist/
+api/serverless.bundle.cjs
 mobile/dist/
 dist/
 web-build/

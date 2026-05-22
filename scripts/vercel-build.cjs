@@ -27,8 +27,14 @@ try {
     stdio: 'inherit',
     env: { ...process.env, NODE_ENV: 'development' },
   })
+  console.log('\n📦 serverless: bundle API para Vercel …')
+  execSync('node scripts/bundle-serverless.cjs', {
+    cwd: root,
+    stdio: 'inherit',
+    env: { ...process.env, NODE_ENV: 'development' },
+  })
 } catch {
-  console.error('\n❌ Falló backend (install o tsc).')
+  console.error('\n❌ Falló backend (install, tsc o bundle serverless).')
   process.exit(1)
 }
 

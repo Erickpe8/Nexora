@@ -1,0 +1,7 @@
+# Acelera deploy por CLI; en Vercel CI se reinstala con installCommand.
+backend/node_modules
+mobile/node_modules
+node_modules
+.git
+backend/logs
+*.log

@@ -1,7 +1,13 @@
 /**
- * Entrada serverless Vercel → Express (`backend/dist/app`).
+ * Entrada serverless Vercel → Express empaquetado en build (`api/serverless.bundle.cjs`).
+ * El bundle se genera en `npm run vercel-build` (scripts/bundle-serverless.cjs).
  */
-import { crearAplicacion } from '../backend/dist/app'
+import type { Application } from 'express'
+
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const { crearAplicacion } = require('./serverless.bundle.cjs') as {
+  crearAplicacion: () => Application
+}
 
 const app = crearAplicacion()
 
