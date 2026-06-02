@@ -1,9 +1,10 @@
 # Encola generación de noticias IA (la cola las procesa cada 5 min).
+# DESACTIVADO: schedule comentado para no consumir DeepSeek API.
 name: Cron — Generar noticias IA
 
 on:
-  schedule:
-    - cron: '15 */2 * * *'
+  # schedule:
+  #   - cron: '15 */2 * * *'
   workflow_dispatch:
 
 concurrency:
